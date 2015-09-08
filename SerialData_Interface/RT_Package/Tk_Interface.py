@@ -15,13 +15,16 @@ class Tk_Interface(tk.Tk):
         top_title = tk_config['top_title']
         icon = tk_config['window_icon']
         
+        ## Set window and internal frame dimensions
+#        window_height = tk_config['window_height']
+
         #tk.Tk.iconbitmap(self, default={}).format(icon)
         tk.Tk.wm_title(self, top_title)
        
-        main_frame = Frame(height=900, width=1000, bg="#a6a8a4")
+        main_frame = Frame(height=800, width=1000, bg="#a6a8a4")
         main_frame.grid(column=0)
 
-        left_frame = Frame(main_frame, width = 200, height = 900, bg="#30ff33") 
+        left_frame = Frame(main_frame, width = 200, height = 800, bg="#30ff33") 
         left_frame.grid(sticky=tk.W, row=0,column=0)
         
         graph_frame = Frame(main_frame, width = 800, height = 600, bg="#ab5950")
