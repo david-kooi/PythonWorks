@@ -15,7 +15,7 @@ def setup(config_file):
 #    graph_config = package_config.getGraphConfig()
 
     c = Config()
-    default_config = c.getDefault()
+    default_config = c.getDefault() # Get Default because config parse not yet implemented
     tk_GUI = Tk_Interface(default_config)
     tk_GUI.mainloop()
 

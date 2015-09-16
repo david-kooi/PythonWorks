@@ -8,8 +8,7 @@ import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 
-
-
+import serial.tools.list_ports
 
 class Tk_Interface(tk.Tk):
 
@@ -73,7 +72,12 @@ class Tk_Interface(tk.Tk):
 
     def __getPorts(self):
 
-        ports = ['one', 'two', 'n']
+        raw_ports = serial.tools.list_ports.comports()
+
+        ports = []
+        ## Parse raw_ports tuple
+        for (name, x, y) in raw_ports:
+            ports.append(name)
 
         return ports
 

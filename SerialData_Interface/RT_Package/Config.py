@@ -41,6 +41,7 @@ class Config(object):
         self.config['default']['tk_window']['main_y'] = 800 
         self.config['default']['tk_window']['main_x'] = 1400
         self.config['default']['tk_window']['dpi'] = 96
+        self.config['default']['tk_window']['command_list'] = 'A'
         ## Color
         self.config['default']['tk_window']['main_background'] = '#a6a8a4'
         self.config['default']['tk_window']['lf_background'] = '#30ff33' 
@@ -59,6 +60,11 @@ class Config(object):
         self.config['default']['tk_window']['bf_y_scale'] = .25
         self.config['default']['tk_window']['graph_y_scale'] = .75
 
+        self.config['command_listA'] = {}
+        self.config['command_listA']['ping'] = 01
+        self.config['command_listA']['start_collection'] = 02
+        self.config['command_listA']['get_data_point'] = 03
+
 
 
     def getGraphConfig(self):
@@ -72,6 +78,9 @@ class Config(object):
 
     def getTkDefault(self):
         return self.config['default']['tk_window'] 
+    def getCommandList(whichList):
+        if whichList == 'A':
+            return self.config['command_listA']
 
     def setGraphField(self, field, value):
         self.config['graph'][field] = value
