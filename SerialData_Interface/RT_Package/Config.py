@@ -41,7 +41,7 @@ class Config(object):
         self.config['default']['tk_window']['main_y'] = 800 
         self.config['default']['tk_window']['main_x'] = 1400
         self.config['default']['tk_window']['dpi'] = 96
-        self.config['default']['tk_window']['command_list'] = 'A'
+
         ## Color
         self.config['default']['tk_window']['main_background'] = '#a6a8a4'
         self.config['default']['tk_window']['lf_background'] = '#30ff33' 
@@ -60,10 +60,17 @@ class Config(object):
         self.config['default']['tk_window']['bf_y_scale'] = .25
         self.config['default']['tk_window']['graph_y_scale'] = .75
 
+        ## Serial Config
+        self.config['default']['serial_config'] = {}
+        self.config['default']['serial_config']['baud'] = 9600
+        self.config['default']['serial_config']['command_list'] = 'A'
+
+
+        ## Commands
         self.config['command_listA'] = {}
-        self.config['command_listA']['ping'] = 01
-        self.config['command_listA']['start_collection'] = 02
-        self.config['command_listA']['get_data_point'] = 03
+        self.config['command_listA']['ping'] = int(0x0B)
+        self.config['command_listA']['start_collection'] = int(0x0C)
+        self.config['command_listA']['get_data_point'] = int(0x0D)
 
 
 
@@ -78,7 +85,7 @@ class Config(object):
 
     def getTkDefault(self):
         return self.config['default']['tk_window'] 
-    def getCommandList(whichList):
+    def getCommandList(self, whichList):
         if whichList == 'A':
             return self.config['command_listA']
 

@@ -1,5 +1,7 @@
 from RT_Plot import *
 from Config import Config 
+import Serial_Interface
+
 import Tkinter as tk
 from Tkinter import *
 
@@ -20,6 +22,7 @@ class Tk_Interface(tk.Tk):
            
         tk_config = config['tk_window'] 
         graph_config = config['graph']
+        serial_config = config['serial_config']
 
         ## Initalize Window
         self.__tkInit(tk_config)
@@ -31,35 +34,12 @@ class Tk_Interface(tk.Tk):
         widget_config = {} # Temporary config dict.
         self.__widgetInit(widget_config)
 
+        ## Initalize Serial Config
+        self.__serialConfigInit(serial_config)
 
-        #insertIntoListbox()
         ## Temp run
-       # self.test_update()
-    
-    def __widgetInit(self, widget_config):
-        self.logger.debug('widgetInit')
 
-        ## Set quit button
-        self.quit_button = Button(self.left_frame, text="Quit", command=self.__quit)
-        self.quit_button.grid(sticky=tk.S, row=0, column=0)
-
-        ## Set port list and port connector button
-        self.port_var = StringVar(self)
-
-        port_list = self.__getPorts()
-        self.port_select = OptionMenu(self.left_frame, self.port_var, *port_list)
-        self.port_select.grid()
-
-        self.connect_button = Button(self.left_frame, text='Connect', command=self.__connectToPort)
-        self.connect_button.grid()
-
-        ## Set scroll window for data display
-        self.listbox = Listbox(self.bottom_frame)
-        self.listbox.grid(sticky=tk.E+tk.W, row=0, column=0, columnspan=100, rowspan=100)
-
-        ## Get Continuous Data Button
-        self.get_data_button = Button(self.left_frame, text='Get Data', command=self.__getData)
-
+        #self.test_update()
 
     def insertIntoListbox():
 
@@ -82,7 +62,23 @@ class Tk_Interface(tk.Tk):
         return ports
 
     def __connectToPort(self):
-        pass
+        port = self.port_vars.get()
+        self.logger.debug('Connecting to Port: {}'.format(port))
+
+
+        self.logger.debug('Initalizing Com_Port')
+        self.serial_port = Serial_Interface.Arduino_Port(port, self.serial_baud, self.cmd_listID)
+
+        ## Ping serial port
+        response = self.serial_port.ping()
+        if response is True:
+            self.logger.info('Successfully Connected to port {}'.format(port))
+            ## Green light
+        else:
+            self.logger.info('Connection to port {} unsuccessful'.format(port))
+            ## Red Light
+
+
     def __quit(self):
         self.destroy()
 
@@ -93,6 +89,42 @@ class Tk_Interface(tk.Tk):
         for y in range(30):
             Grid.rowconfigure(frame, y, weight=1)
 
+
+    ##                                          ##
+    ##     Instance Variable Initalization      ##
+    ##                                          ##
+    ##                                          ##
+
+    def __serialConfigInit(self, serial_config):
+        self.logger.debug('serialConfig')
+
+        self.serial_baud = serial_config['baud']
+        self.cmd_listID = serial_config['command_list']
+
+    def __widgetInit(self, widget_config):
+        self.logger.debug('widgetInit')
+
+        ## Set quit button
+        self.quit_button = Button(self.left_frame, text="Quit", command=self.__quit)
+        self.quit_button.grid(sticky=tk.S, row=0, column=0)
+
+        ## Port list
+        self.port_vars = StringVar(self)
+
+        port_list = self.__getPorts()
+        self.port_select = OptionMenu(self.left_frame, self.port_vars, *port_list)
+        self.port_select.grid()
+
+        ## Connect Button
+        self.connect_button = Button(self.left_frame, text='Connect', command=self.__connectToPort)
+        self.connect_button.grid()
+
+        ## Set scroll window for data display
+        self.listbox = Listbox(self.bottom_frame)
+        self.listbox.grid(sticky=tk.E+tk.W, row=0, column=0, columnspan=100, rowspan=100)
+
+        ## Get Continuous Data Button
+        self.get_data_button = Button(self.left_frame, text='Get Data', command=self.__getData)
     def __graphInit(self, graph_config):
         self.logger.debug('graphInit')
         ## Wrap generated graph values
@@ -103,7 +135,6 @@ class Tk_Interface(tk.Tk):
         graph_values['dpi'] = self.dpi
         
         self.rt_plot = RT_Plot(self.graph_frame, graph_config, graph_values) 
-
 
     def __tkInit(self, tk_config):
         self.logger.debug('tkInit')
@@ -156,7 +187,6 @@ class Tk_Interface(tk.Tk):
         self.bottom_frame.grid(sticky=tk.S, row=9, column=2)
         self.bottom_frame.grid_propagate(False)
         self.__configureGrid(self.bottom_frame)
-
 
         ## Graph Frame
         self.graph_frame = Frame(self.main_frame, width = self.graph_x, height = self.graph_y, bg=graph_bg)
