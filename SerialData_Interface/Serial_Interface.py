@@ -41,7 +41,7 @@ class Com_Port(object):
          
 
 
-class Arduino_Port(Object):
+class Arduino_Port(object):
 
     def __init__(self, port, baud, cmd_listID):
         self.logger = logging.getLogger('Arduino_Port')

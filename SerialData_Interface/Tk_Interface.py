@@ -1,6 +1,7 @@
 from RT_Plot import *
 from Config import Config 
-import Serial_Interface
+import Arduino_Interface
+from Arduino_Interface import *
 
 import Tkinter as tk
 from Tkinter import *
@@ -12,7 +13,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolb
 
 import serial.tools.list_ports
 
+
 class Tk_Interface(tk.Tk):
+
+    ## Standard Timeout
+    STD_TO = 15
 
     def __init__(self, config, *args, **kwargs):  
         self.logger = logging.getLogger('Tk_Interface')
@@ -24,6 +29,10 @@ class Tk_Interface(tk.Tk):
         graph_config = config['graph']
         serial_config = config['serial_config']
 
+        ## Runtime status
+        self.status_reg = {}
+        self.status_reg[Arduino_Interface.PING] = False # Are we connected?
+
         ## Initalize Window
         self.__tkInit(tk_config)
        
@@ -34,21 +43,26 @@ class Tk_Interface(tk.Tk):
         widget_config = {} # Temporary config dict.
         self.__widgetInit(widget_config)
 
-        ## Initalize Serial Config
+        ## Initalize Serial Configuration
         self.__serialConfigInit(serial_config)
 
+
         ## Temp run
-
         #self.test_update()
+    
 
-    def insertIntoListbox():
 
-        for i in range(100):
-            self.listbox.insert(END, i)
+    ##                                          ##
+    ##             Utility Methods              ##
+    ##                                          ##
+    ##                                          ##
+
 
 
     def __getData(self):
         pass
+
+
 
     def __getPorts(self):
 
@@ -61,26 +75,7 @@ class Tk_Interface(tk.Tk):
 
         return ports
 
-    def __connectToPort(self):
-        port = self.port_vars.get()
-        self.logger.debug('Connecting to Port: {}'.format(port))
 
-
-        self.logger.debug('Initalizing Com_Port')
-        self.serial_port = Serial_Interface.Arduino_Port(port, self.serial_baud, self.cmd_listID)
-
-        ## Ping serial port
-        response = self.serial_port.ping()
-        if response is True:
-            self.logger.info('Successfully Connected to port {}'.format(port))
-            ## Green light
-        else:
-            self.logger.info('Connection to port {} unsuccessful'.format(port))
-            ## Red Light
-
-
-    def __quit(self):
-        self.destroy()
 
     def __configureGrid(self, frame):
         for x in range(60):
@@ -90,8 +85,72 @@ class Tk_Interface(tk.Tk):
             Grid.rowconfigure(frame, y, weight=1)
 
 
+
+    def insertIntoListbox():
+
+        for i in range(100):
+            self.listbox.insert(END, i)        
+
+
+    def checkTimeout(self, time_limit):
+        start_time = time.time()
+
+        ## Timeout check
+        while(self.status_reg['WAITING'] is True):
+            end_time = time.time()
+            if end_time-start_time == time_limit:
+                raise RuntimeWarning
+
+        ## Return true if we escape time loop
+        return True
+
     ##                                          ##
-    ##     Instance Variable Initalization      ##
+    ##               On Click                   ##
+    ##                                          ##
+    ##                                          ##
+
+
+
+    def __connectToPort(self):
+        try:
+
+            port = self.port_vars.get()
+            self.logger.debug('Connecting to Port: {}'.format(port))
+
+            self.logger.debug('----Initalizing Arduino Interface----')
+            self.arduino_interface = Arduino_Interface(port)
+
+            ## Send ping
+            self.arduino_interface.ping(self.pingCallback)
+
+            ## Do we need a delay to allow communcation??
+            if self.status_reg[Arduino_Interface.PING]:
+                self.logger.info('Successfully Connected to port {}'.format(port))
+                ## Green light
+            else:
+                self.logger.info('Connection to port {} unsuccessful'.format(port))
+                ## Red Light
+        except Exception as e:
+            self.logger.error('Exception: {}'.format(str(e)))
+
+
+    def __quit(self):
+        self.destroy()
+
+
+
+
+    ##                                          ##
+    ##                CallBacks                 ##
+    ##                                          ##
+    ##                                          ##
+    
+    def pingCallback(self, status):
+        self.logger.debug('pingCallback')
+        self.status_reg[Arduino_Interface.PING] = status
+
+    ##                                          ##
+    ##              Initalization               ##
     ##                                          ##
     ##                                          ##
 
