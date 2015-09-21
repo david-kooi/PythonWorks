@@ -8,6 +8,7 @@ class Arduino_Interface(object):
 
 
 	PING = 0x01
+	GET_DATA = 0x02
 
 
 	def __init__(self, port):

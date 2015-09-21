@@ -7,6 +7,8 @@ import Tkinter as tk
 from Tkinter import *
 
 import logging
+from Tk_Logging import *
+
 import matplotlib
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
@@ -47,6 +49,12 @@ class Tk_Interface(tk.Tk):
         self.__serialConfigInit(serial_config)
 
 
+        ## Setup is done. Add logging handlers
+        self.logger.debug('Adding Handler')
+        h = Tk_Logging_Handler(level=logging.DEBUG, listbox=self.listbox)
+        self.logger.addHandler(h)
+
+
         ## Temp run
         #self.test_update()
     
@@ -56,12 +64,6 @@ class Tk_Interface(tk.Tk):
     ##             Utility Methods              ##
     ##                                          ##
     ##                                          ##
-
-
-
-    def __getData(self):
-        pass
-
 
 
     def __getPorts(self):
@@ -77,13 +79,12 @@ class Tk_Interface(tk.Tk):
 
 
 
-    def __configureGrid(self, frame):
-        for x in range(60):
+    def __configureGrid(self, frame, max_rows, max_cols):
+        for x in range(max_cols):
             Grid.columnconfigure(frame, x, weight=1)
 
-        for y in range(30):
+        for y in range(max_rows):
             Grid.rowconfigure(frame, y, weight=1)
-
 
 
     def insertIntoListbox():
@@ -104,11 +105,11 @@ class Tk_Interface(tk.Tk):
         ## Return true if we escape time loop
         return True
 
+
     ##                                          ##
     ##               On Click                   ##
     ##                                          ##
     ##                                          ##
-
 
 
     def __connectToPort(self):
@@ -134,10 +135,11 @@ class Tk_Interface(tk.Tk):
             self.logger.error('Exception: {}'.format(str(e)))
 
 
+    def __getData(self):
+        self.logger.debug('getData')
+
     def __quit(self):
         self.destroy()
-
-
 
 
     ##                                          ##
@@ -148,6 +150,7 @@ class Tk_Interface(tk.Tk):
     def pingCallback(self, status):
         self.logger.debug('pingCallback')
         self.status_reg[Arduino_Interface.PING] = status
+
 
     ##                                          ##
     ##              Initalization               ##
@@ -163,20 +166,15 @@ class Tk_Interface(tk.Tk):
     def __widgetInit(self, widget_config):
         self.logger.debug('widgetInit')
 
-        ## Set quit button
-        self.quit_button = Button(self.left_frame, text="Quit", command=self.__quit)
-        self.quit_button.grid(sticky=tk.S, row=0, column=0)
-
         ## Port list
         self.port_vars = StringVar(self)
-
         port_list = self.__getPorts()
         self.port_select = OptionMenu(self.left_frame, self.port_vars, *port_list)
-        self.port_select.grid()
+        self.port_select.grid(sticky=tk.N, row=1, column=1)
 
         ## Connect Button
         self.connect_button = Button(self.left_frame, text='Connect', command=self.__connectToPort)
-        self.connect_button.grid()
+        self.connect_button.grid(sticky=tk.S, row=1, column=1)
 
         ## Set scroll window for data display
         self.listbox = Listbox(self.bottom_frame)
@@ -184,6 +182,13 @@ class Tk_Interface(tk.Tk):
 
         ## Get Continuous Data Button
         self.get_data_button = Button(self.left_frame, text='Get Data', command=self.__getData)
+        self.get_data_button.grid(row=2, column=1)
+
+        ## Set quit button
+        self.quit_button = Button(self.left_frame, text="Quit", command=self.__quit)
+        self.quit_button.grid(sticky=tk.S, row=19, column=1)
+
+
     def __graphInit(self, graph_config):
         self.logger.debug('graphInit')
         ## Wrap generated graph values
@@ -233,19 +238,19 @@ class Tk_Interface(tk.Tk):
         ## Main Frame
         self.main_frame = Frame(height=self.main_y, width=self.main_x, bg=main_background)
         self.main_frame.grid(column=0)
-        self.__configureGrid(self.main_frame)
+        self.__configureGrid(self.main_frame, tk_config['default_max_rows'], tk_config['default_max_cols'])
 
         ## Left Frame
         self.left_frame = Frame(self.main_frame, width = self.lf_x, height = self.lf_y, bg=lf_bg) 
         self.left_frame.grid(sticky=tk.W, row=0,column=0, rowspan=10, columnspan=2)
         self.left_frame.grid_propagate(False)
-        self.__configureGrid(self.left_frame)
+        self.__configureGrid(self.left_frame, tk_config['default_max_rows'], tk_config['default_max_cols'])
         
         ## Bottom Frame
         self.bottom_frame = Frame(self.main_frame, width = self.bf_x, height = self.bf_y, bg=bf_bg)
         self.bottom_frame.grid(sticky=tk.S, row=9, column=2)
         self.bottom_frame.grid_propagate(False)
-        self.__configureGrid(self.bottom_frame)
+        self.__configureGrid(self.bottom_frame, tk_config['default_max_rows'], tk_config['default_max_cols'])
 
         ## Graph Frame
         self.graph_frame = Frame(self.main_frame, width = self.graph_x, height = self.graph_y, bg=graph_bg)

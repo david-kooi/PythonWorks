@@ -42,6 +42,14 @@ class Config(object):
         self.config['default']['tk_window']['main_x'] = 1400
         self.config['default']['tk_window']['dpi'] = 96
 
+        ## Grid Configuration
+        #self.config['default']['tk_window']['lf_max_rows'] = 20
+        #self.config['default']['tk_window']['lf_max_cols'] = 20
+        self.config['default']['tk_window']['default_max_rows'] = 20
+        self.config['default']['tk_window']['default_max_cols'] = 3
+
+
+
         ## Color
         self.config['default']['tk_window']['main_background'] = '#a6a8a4'
         self.config['default']['tk_window']['lf_background'] = '#30ff33' 
@@ -64,7 +72,6 @@ class Config(object):
         self.config['default']['serial_config'] = {}
         self.config['default']['serial_config']['baud'] = 9600
         self.config['default']['serial_config']['command_list'] = 'A'
-
 
         ## Commands
         self.config['command_listA'] = {}
