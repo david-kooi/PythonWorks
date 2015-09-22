@@ -35,6 +35,10 @@ class Tk_Interface(tk.Tk):
         self.status_reg = {}
         self.status_reg[Arduino_Interface.PING] = False # Are we connected?
 
+        ## Input Buffers
+        self.x_buffer = []
+        self.y_buffer = []
+
         ## Initalize Window
         self.__tkInit(tk_config)
        
@@ -51,8 +55,8 @@ class Tk_Interface(tk.Tk):
 
         ## Setup is done. Add logging handlers
         self.logger.debug('Adding Handler')
-        h = Tk_Logging_Handler(level=logging.DEBUG, listbox=self.listbox)
-        self.logger.addHandler(h)
+        self.log_handler = Tk_Logging_Handler(level=logging.DEBUG, listbox=self.listbox)
+        self.logger.addHandler(self.log_handler)
 
 
         ## Temp run
@@ -77,20 +81,13 @@ class Tk_Interface(tk.Tk):
 
         return ports
 
-
-
     def __configureGrid(self, frame, max_rows, max_cols):
         for x in range(max_cols):
             Grid.columnconfigure(frame, x, weight=1)
 
         for y in range(max_rows):
             Grid.rowconfigure(frame, y, weight=1)
-
-
-    def insertIntoListbox():
-
-        for i in range(100):
-            self.listbox.insert(END, i)        
+      
 
 
     def checkTimeout(self, time_limit):
@@ -119,7 +116,7 @@ class Tk_Interface(tk.Tk):
             self.logger.debug('Connecting to Port: {}'.format(port))
 
             self.logger.debug('----Initalizing Arduino Interface----')
-            self.arduino_interface = Arduino_Interface(port)
+            self.arduino_interface = Arduino_Interface(port, self.log_handler)
 
             ## Send ping
             self.arduino_interface.ping(self.pingCallback)
@@ -135,8 +132,14 @@ class Tk_Interface(tk.Tk):
             self.logger.error('Exception: {}'.format(str(e)))
 
 
-    def __getData(self):
-        self.logger.debug('getData')
+    def __getTestData(self):
+        self.logger.debug('----Getting Test Data----')
+        self.arduino_interface.requestTestData(self.testDataCallback)
+
+        self.logger.debug('x_buffer: {}'.format(len(self.x_buffer)))
+        self.logger.debug('y_buffer: {}'.format(len(self.y_buffer)))
+        self.rt_plot.read_data(self.x_buffer, self.y_buffer)
+
 
     def __quit(self):
         self.destroy()
@@ -152,7 +155,23 @@ class Tk_Interface(tk.Tk):
         self.status_reg[Arduino_Interface.PING] = status
 
     def testDataCallback(self, incoming_data):
-        ## TODO
+        self.logger.debug('----testDataCallback----')
+
+
+        for idx,data in enumerate(incoming_data):
+            ## Time Point
+            if (idx % 2 == 0):
+                self.x_buffer.append(data)
+            else:
+                self.y_buffer.append(data)
+
+
+        ## Make buffers the same size
+        while len(self.x_buffer) > len(self.y_buffer):
+            self.x_buffer.pop()
+      
+      #  while len(self.y_buffer) > len(self.x_buffer):
+      #     self.x_buffer.append()
 
     ##                                          ##
     ##              Initalization               ##
@@ -183,7 +202,7 @@ class Tk_Interface(tk.Tk):
         self.listbox.grid(sticky=tk.E+tk.W, row=0, column=0, columnspan=100, rowspan=100)
 
         ## Get Continuous Data Button
-        self.get_data_button = Button(self.left_frame, text='Get Data', command=self.__getData)
+        self.get_data_button = Button(self.left_frame, text='Get Test Data', command=self.__getTestData)
         self.get_data_button.grid(row=2, column=1)
 
         ## Set quit button

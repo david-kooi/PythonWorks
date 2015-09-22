@@ -5,17 +5,36 @@ import binascii
 import logging
 
 class Arduino_Interface(object):
-
+	##                                          ##
+	##               CONSTANTS                  ##
+	##                                          ##
+	##                                          ##
 
 	PING = 0x01
-	TEST_DATA = 0x0A
+	TEST_DATA = 0x02
 
 
-	def __init__(self, port):
+
+
+
+
+
+
+
+
+
+	##                                          ##
+	##            Initalization                 ##
+	##                                          ##
+	##                                          ##
+
+
+
+	def __init__(self, port, log_handler):
 		## Initalize logging
 		logging.basicConfig(level=logging.DEBUG)
-
 		self.logger = logging.getLogger('Arduino_Interface')
+		self.logger.addHandler(log_handler) # Add Tk log handler
 		self.logger.debug('__init__')
 
 
@@ -32,26 +51,6 @@ class Arduino_Interface(object):
 
 
 
-	def sendString(self, stringToSend):
-		pass
-		#self.board.send_sysex
-
-	
-
-
-
-
-	#	for byte in dataArray:
-	#		self.incoming_data.append(chr(byte))
-	#	print self.incoming_data
-
-
-
-
-
-
-
-
 
 	##                                          ##
 	##           Runtime Functions              ##
@@ -63,16 +62,16 @@ class Arduino_Interface(object):
 		self.board.iterate()
 
 
-
 	##                                          ##
 	##              Senders                     ##
 	##                                          ##
 	##                                          ##
 
 
-
 	def ping(self, pingCallback):
 		self.logger.debug('----Sending Ping----')
+
+
 		## Attach callback
 		self.callback_holder[Arduino_Interface.PING] = pingCallback
 
@@ -80,13 +79,12 @@ class Arduino_Interface(object):
 		byte_array = bytearray()
 		byte_array.append(Arduino_Interface.PING)
 
-
 		self.sendSysEx(byte_array)
 
-		self.begin_scanning()
 
-	def request_testData(self, testDataCallback):
+	def requestTestData(self, testDataCallback):
 		self.logger.debug('----Requesting Test Data----')
+		
 		## Attach callback
 		self.callback_holder[Arduino_Interface.TEST_DATA] = testDataCallback
 
@@ -95,14 +93,28 @@ class Arduino_Interface(object):
 
 		self.sendSysEx(byte_array)
 
-		self.begin_scanning()
 
 
 
 	def sendSysEx(self, byteArray):
 		self.logger.debug('----sendSysEx----')
-		self.logger.debug('Data: {}'.format(binascii.hexlify(byteArray)))
+		self.logger.debug('SEND Data: {}'.format(binascii.hexlify(byteArray)))
 		self.board.send_sysex(pyfirmata.START_SYSEX, byteArray)
+
+		self.begin_scanning()
+
+
+
+
+	def sendString(self, stringToSend):
+		pass
+		#self.board.send_sysex
+
+	
+	#	for byte in dataArray:
+	#		self.incoming_data.append(chr(byte))
+	#	print self.incoming_data
+
 
 
 
@@ -130,7 +142,7 @@ class Arduino_Interface(object):
 
 		## Flush incoming_data array
 		self.incoming_data = []
-		self.incoming_data = filterSysEx(bytearray)
+		self.incoming_data = self.filterSysEx(byteArray)
 
 		## Get header
 		header = byteArray[0]
@@ -155,12 +167,16 @@ class Arduino_Interface(object):
 	##                                          ##
 
 
-	def filterSysEx(byteArray):
+	def filterSysEx(self, byteArray):
+		self.logger.debug('filterSysEx')
+
 		incoming_data = []
 		for idx, byte in enumerate(byteArray):
-			if idx == 0: ## Skip header
+			if idx == 0:
 				continue
 			incoming_data.append(byte)
+
+		self.logger.debug('SysEx Data:')
 		self.logger.debug(incoming_data)
 		return incoming_data
 
