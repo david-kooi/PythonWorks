@@ -151,6 +151,8 @@ class Tk_Interface(tk.Tk):
         self.logger.debug('pingCallback')
         self.status_reg[Arduino_Interface.PING] = status
 
+    def testDataCallback(self, incoming_data):
+        ## TODO
 
     ##                                          ##
     ##              Initalization               ##

@@ -8,7 +8,7 @@ class Arduino_Interface(object):
 
 
 	PING = 0x01
-	GET_DATA = 0x02
+	TEST_DATA = 0x0A
 
 
 	def __init__(self, port):
@@ -30,6 +30,47 @@ class Arduino_Interface(object):
 		## Callback holder
 		self.callback_holder = dict()
 
+
+
+	def sendString(self, stringToSend):
+		pass
+		#self.board.send_sysex
+
+	
+
+
+
+
+	#	for byte in dataArray:
+	#		self.incoming_data.append(chr(byte))
+	#	print self.incoming_data
+
+
+
+
+
+
+
+
+
+	##                                          ##
+	##           Runtime Functions              ##
+	##                                          ##
+	##                                          ##
+
+
+	def begin_scanning(self):
+		self.board.iterate()
+
+
+
+	##                                          ##
+	##              Senders                     ##
+	##                                          ##
+	##                                          ##
+
+
+
 	def ping(self, pingCallback):
 		self.logger.debug('----Sending Ping----')
 		## Attach callback
@@ -44,45 +85,31 @@ class Arduino_Interface(object):
 
 		self.begin_scanning()
 
+	def request_testData(self, testDataCallback):
+		self.logger.debug('----Requesting Test Data----')
+		## Attach callback
+		self.callback_holder[Arduino_Interface.TEST_DATA] = testDataCallback
+
+		byte_array = bytearray()
+		byte_array.append(Arduino_Interface.TEST_DATA)
+
+		self.sendSysEx(byte_array)
+
+		self.begin_scanning()
+
+
+
 	def sendSysEx(self, byteArray):
 		self.logger.debug('----sendSysEx----')
 		self.logger.debug('Data: {}'.format(binascii.hexlify(byteArray)))
 		self.board.send_sysex(pyfirmata.START_SYSEX, byteArray)
 
-	def sendString(self, stringToSend):
-		pass
-		#self.board.send_sysex
-
-	def handleIncomingSysEx(self, *byteArray):
-		self.logger.debug('----Incoming SysEx----')
-
-		## Flush incoming_data array
-		self.incoming_data = []
 
 
-		for byte in byteArray:
-			self.incoming_data.append(byte)
-		print self.incoming_data
-
-		## Get header
-		header = byteArray[0]
-		self.logger.debug('header: {}'.format(header))
-		
-
-		if (header == Arduino_Interface.PING) :
-			self.logger.debug('PING Response recieved')
-			## Ping response recieved. Return True
-			self.callback_holder[Arduino_Interface.PING](True)
-
-		elif (header == Arduino_Interface.PING):
-			pass
-
-
-
-
-	#	for byte in dataArray:
-	#		self.incoming_data.append(chr(byte))
-	#	print self.incoming_data
+	##                                          ##
+	##              Handlers                    ##
+	##                                          ##
+	##                                          ##
 
 	def handleIncomingString(self, *string):
 		self.logger.debug('handling Incoming String')
@@ -96,8 +123,52 @@ class Arduino_Interface(object):
 		recieved_string = ''.join(self.incoming_data)
 		print recieved_string
 
-	def begin_scanning(self):
-		self.board.iterate()
+
+
+	def handleIncomingSysEx(self, *byteArray):
+		self.logger.debug('----Incoming SysEx----')
+
+		## Flush incoming_data array
+		self.incoming_data = []
+		self.incoming_data = filterSysEx(bytearray)
+
+		## Get header
+		header = byteArray[0]
+		self.logger.debug('header: {}'.format(header))
+		
+
+		if (header == Arduino_Interface.PING):
+			self.logger.debug('PING Response recieved')
+			## Ping response recieved. Return True
+			self.callback_holder[Arduino_Interface.PING](True)
+
+		elif (header == Arduino_Interface.TEST_DATA):
+			self.logger.debug('Test Data recieved')
+			self.callback_holder[Arduino_Interface.TEST_DATA](self.incoming_data)
+
+
+
+
+	##                                          ##
+	##              Utilities                   ##
+	##                                          ##
+	##                                          ##
+
+
+	def filterSysEx(byteArray):
+		incoming_data = []
+		for idx, byte in enumerate(byteArray):
+			if idx == 0: ## Skip header
+				continue
+			incoming_data.append(byte)
+		self.logger.debug(incoming_data)
+		return incoming_data
+
+
+##                                          ##
+##              Test Stuff                  ##
+##                                          ##
+##                                          ##
 
 class X(object):
 	def __init__(self):
