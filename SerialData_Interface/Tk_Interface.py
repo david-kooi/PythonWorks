@@ -36,8 +36,8 @@ class Tk_Interface(tk.Tk):
         self.status_reg[Arduino_Interface.PING] = False # Are we connected?
 
         ## Input Buffers
-        self.x_buffer = []
-        self.y_buffer = []
+        self.x_buffer = [20]
+        self.y_buffer = [20]
 
         ## Initalize Window
         self.__tkInit(tk_config)
@@ -68,6 +68,10 @@ class Tk_Interface(tk.Tk):
     ##             Utility Methods              ##
     ##                                          ##
     ##                                          ##
+
+    def flushBuffers(self):
+        self.x_buffer = []
+        self.y_buffer = []
 
 
     def __getPorts(self):
@@ -133,13 +137,15 @@ class Tk_Interface(tk.Tk):
 
 
     def __getTestData(self):
-        self.logger.debug('----Getting Test Data----')
-        self.arduino_interface.requestTestData(self.testDataCallback)
+        for i in range(50):
+            self.logger.debug('----Getting Test Data----')
+            self.arduino_interface.requestTestData(self.testDataCallback)
 
-        self.logger.debug('x_buffer: {}'.format(len(self.x_buffer)))
-        self.logger.debug('y_buffer: {}'.format(len(self.y_buffer)))
-        self.rt_plot.read_data(self.x_buffer, self.y_buffer)
+            self.logger.debug('x_buffer: {}'.format(len(self.x_buffer)))
+            self.logger.debug('y_buffer: {}'.format(len(self.y_buffer)))
+            self.rt_plot.read_data(self.x_buffer, self.y_buffer)
 
+            self.flushBuffers()
 
     def __quit(self):
         self.destroy()
@@ -170,8 +176,6 @@ class Tk_Interface(tk.Tk):
         while len(self.x_buffer) > len(self.y_buffer):
             self.x_buffer.pop()
       
-      #  while len(self.y_buffer) > len(self.x_buffer):
-      #     self.x_buffer.append()
 
     ##                                          ##
     ##              Initalization               ##
