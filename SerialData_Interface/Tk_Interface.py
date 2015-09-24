@@ -31,13 +31,16 @@ class Tk_Interface(tk.Tk):
         graph_config = config['graph']
         serial_config = config['serial_config']
 
-        ## Runtime status
+        ## Status Registers
         self.status_reg = {}
         self.status_reg[Arduino_Interface.PING] = False # Are we connected?
 
-        ## Input Buffers
-        self.x_buffer = [20]
-        self.y_buffer = [20]
+        ## Data Buffers
+        self.x_buffer = []
+        self.y_buffer = []
+
+        ## Total Data Points
+        self.total_points = 0
 
         ## Initalize Window
         self.__tkInit(tk_config)
@@ -69,7 +72,7 @@ class Tk_Interface(tk.Tk):
     ##                                          ##
     ##                                          ##
 
-    def flushBuffers(self):
+    def __flushBuffers(self):
         self.x_buffer = []
         self.y_buffer = []
 
@@ -94,7 +97,7 @@ class Tk_Interface(tk.Tk):
       
 
 
-    def checkTimeout(self, time_limit):
+    def __checkTimeout(self, time_limit):
         start_time = time.time()
 
         ## Timeout check
@@ -123,7 +126,7 @@ class Tk_Interface(tk.Tk):
             self.arduino_interface = Arduino_Interface(port, self.log_handler)
 
             ## Send ping
-            self.arduino_interface.ping(self.pingCallback)
+            self.arduino_interface.ping(self.__pingCallback)
 
             ## Do we need a delay to allow communcation??
             if self.status_reg[Arduino_Interface.PING]:
@@ -137,15 +140,15 @@ class Tk_Interface(tk.Tk):
 
 
     def __getTestData(self):
-        for i in range(50):
+        for i in range(10):
             self.logger.debug('----Getting Test Data----')
-            self.arduino_interface.requestTestData(self.testDataCallback)
+            self.arduino_interface.requestTestData(self.__testDataCallback)
 
             self.logger.debug('x_buffer: {}'.format(len(self.x_buffer)))
             self.logger.debug('y_buffer: {}'.format(len(self.y_buffer)))
             self.rt_plot.read_data(self.x_buffer, self.y_buffer)
 
-            self.flushBuffers()
+            #self.__flushBuffers()
 
     def __quit(self):
         self.destroy()
@@ -156,21 +159,18 @@ class Tk_Interface(tk.Tk):
     ##                                          ##
     ##                                          ##
     
-    def pingCallback(self, status):
+    def __pingCallback(self, status):
         self.logger.debug('pingCallback')
         self.status_reg[Arduino_Interface.PING] = status
 
-    def testDataCallback(self, incoming_data):
+    def __testDataCallback(self, incoming_data):
         self.logger.debug('----testDataCallback----')
 
 
-        for idx,data in enumerate(incoming_data):
-            ## Time Point
-            if (idx % 2 == 0):
-                self.x_buffer.append(data)
-            else:
-                self.y_buffer.append(data)
-
+        for data in incoming_data:        
+            self.x_buffer.append(self.total_points)
+            self.y_buffer.append(data)
+            self.total_points = self.total_points +  1
 
         ## Make buffers the same size
         while len(self.x_buffer) > len(self.y_buffer):
@@ -248,6 +248,10 @@ class Tk_Interface(tk.Tk):
         ## Left Frame
         self.lf_x = self.main_x * tk_config['lf_x_scale']
         self.lf_y = self.main_y
+
+        ## Color Frame
+        self.cf_x = self.lf_x 
+        self.cf_y = .3 * self.lf_y
         
         ## Bottom Frame
         self.bf_x = self.main_x * tk_config['bf_x_scale']
@@ -280,6 +284,10 @@ class Tk_Interface(tk.Tk):
         ## Graph Frame
         self.graph_frame = Frame(self.main_frame, width = self.graph_x, height = self.graph_y, bg=graph_bg)
         self.graph_frame.grid(sticky=tk.N, row=0, column=2)
+
+        ## Color Frame
+        self.color_frame = Frame(self.left_frame, width = self.cf_x, height = self.cf_y)
+
 
 if __name__=='__main__':
 

@@ -5,6 +5,8 @@ import binascii
 import logging
 
 class Arduino_Interface(object):
+
+
 	##                                          ##
 	##               CONSTANTS                  ##
 	##                                          ##
@@ -12,11 +14,6 @@ class Arduino_Interface(object):
 
 	PING = 0x01
 	TEST_DATA = 0x02
-
-
-
-
-
 
 
 

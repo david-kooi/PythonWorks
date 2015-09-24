@@ -1,6 +1,6 @@
 
 
-## Configuration class is singleton
+## Configuration class
 class Config(object):
 
     def __init__(self):
@@ -47,8 +47,6 @@ class Config(object):
         #self.config['default']['tk_window']['lf_max_cols'] = 20
         self.config['default']['tk_window']['default_max_rows'] = 20
         self.config['default']['tk_window']['default_max_cols'] = 3
-
-
 
         ## Color
         self.config['default']['tk_window']['main_background'] = '#a6a8a4'

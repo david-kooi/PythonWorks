@@ -41,7 +41,7 @@ class RT_Plot():
 
         # Autoscale on unknown axis 
         self.rt_plot.set_autoscaley_on(True)
-        
+        self.rt_plot.set_autoscalex_on(True)
         # Set x limits?
 
         # Create canvas
