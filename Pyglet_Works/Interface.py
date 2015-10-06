@@ -32,7 +32,13 @@ class Interface(pyglet.window.Window):
 		self.Config = Config.Config(self)
 
 		## Default Case
-		self.current_case = 'case_1'
+		self.current_case = Interface.CASE_1
+
+		## Register case triggers
+		self.periodics = Periodic(self)
+		self.case_triggers = dict()
+		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
+		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
 
 		## Batch and Group Hiearchy	
 			## General Batch
@@ -40,7 +46,13 @@ class Interface(pyglet.window.Window):
 			#	- background [Ordered Group]
 			#	|
 			#	- foreground [Ordered Group]
-
+			#
+			## Case Batch
+			#   |
+			#	- background
+			#	|
+			#   - foreground
+		## When on draw is called the general and case batch will be drawn
 
 		## Create Batches and Groups
 		self.general_batch = pyglet.graphics.Batch()
@@ -51,30 +63,22 @@ class Interface(pyglet.window.Window):
 		self.background_group = pyglet.graphics.OrderedGroup(0)
 		self.foreground_group = pyglet.graphics.OrderedGroup(1)
 
-		## Create a way to access the batches & groups
+		## Create a way to access the groups
 		self.batch_dict = dict()
-		self.batch_dict['general_batch'] = self.general_batch
-		self.batch_dict['case_batch'] = self.case_batch
 		self.batch_dict['background_group'] = self.background_group
 		self.batch_dict['foreground_group'] = self.foreground_group
-		self.batch_dict['labels'] = []
 
-
+		## Fill batches
 		tup = self.fillBatch(Interface.GENERAL)
 		self.general_batch = tup[0]
 		self.general_labels = tup[1]
 
-		tup = self.fillBatch(Interface.CASE_1)
+		tup = self.fillBatch(self.current_case)
 		self.case_batch = tup[0]
 		self.case_labels = tup[1]
 
-		## Register Switch State Event Event
-		#self.register_event_type('dispatch_switch_state')
-		#self.push_handlers(dispatch_switch_state=self.switch_state)
-
 		## Start Periodic Functions
-		periodics = Periodic(self)
-		pyglet.clock.schedule_interval(periodics.case_1_Trigger, 1)
+		pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
 
 	
 	def fillBatch(self, whichBatch):
@@ -97,7 +101,12 @@ class Interface(pyglet.window.Window):
 				continue
 
 			for group in self.Config.config[category]:
-				this_group = self.batch_dict[group]
+
+				try:
+					this_group = self.batch_dict[group]
+				except KeyError:
+					pass
+
 				for key in self.Config.config[category][group]:
 					prim = self.Config.config[category][group][key]
 					if(isinstance(prim, pgedraw.basic.Shape)): ## If we have a primitive
@@ -121,6 +130,8 @@ class Interface(pyglet.window.Window):
 
 	def something(self):
 		logger.debug("something!")
+	def another(self):
+		logger.debug('another!')
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		print "mouse pressed"
@@ -139,14 +150,16 @@ class Periodic(object):
 	def __init__(self, interface):
 		self.interface = interface
 
-	def case_1_Trigger(self, dt):
-		print "trigger dt: {}".format(dt)
+	def case_1(self, dt):
+		logger.debug("periodic: CASE_1")
 		self.interface.something()
-		self.interface.switch_state(Interface.CASE_1)
-	
-	def case_2_Trigger(self, dt):
-		pass
 
+	def case_1_track_clock(self, dt):
+		pass
+	
+	def case_2(self, dt):
+		logger.debug('periodic: CASE_2')
+		self.interface.another()
 
 if __name__ == "__main__":
 	logging.basicConfig(level=logging.DEBUG)

@@ -9,9 +9,13 @@ class Config(object):
             logging.basicConfig(level=logging.DEBUG)
             logger = logging.getLogger('Config')
 
-            self.IF_BG_COLOR = (176, 163, 156, 255)
+
+            ## COLORS
+            self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
             self.TRACK_COLOR = (228, 68, 68, 255)
             self.POD_COLOR = (255, 255, 255, 255)
+            self.BLUE = (64, 97, 228, 255)
+
             self.POD_RADIUS = 30
 
             self.X_ZERO = Interface.X_ZERO
@@ -23,7 +27,12 @@ class Config(object):
             self.TRACK_WIDTH = self.POD_RADIUS*2
             self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
 
+            self.BUTTON_HEIGHT = Interface.window_height/15
+            self.BUTTON_WIDTH = Interface.window_width/5
 
+            ##Next Button
+            self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
+            self.n_BUTTON_Y = 0 + self.Y_ZERO/4
 
             self.config = dict()
 
@@ -35,6 +44,8 @@ class Config(object):
       
 
             self.config['general']['foreground_group'] = dict()
+            self.config['general']['foreground_group']['next_button'] = Prims.Rectangle((self.n_BUTTON_X, self.n_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
+                                                                              color=self.BLUE)
 
             self.config['general']['labels'] = dict()
             self.config['general']['labels']['title']= pyglet.text.Label('Default Title', 
@@ -61,6 +72,9 @@ class Config(object):
                                                                           
 
             self.config['case_1']['foreground_group'] = []
+
+            self.config['case_1']['functions'] = dict()
+            #self.config['case_1']['functions']
 
             ## Circular Motion
             self.config['case_2'] = dict()
