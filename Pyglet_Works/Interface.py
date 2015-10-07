@@ -4,6 +4,7 @@ from pgedraw import basic as Prims #Primatives
 import pgedraw
 
 import Config
+import ObjectRegistry
 import logging
 
 ## Subclass window
@@ -20,6 +21,9 @@ class Interface(pyglet.window.Window):
 		logger.debug("__init__")
 		pyglet.window.Window.__init__(self, width=w, height=h, caption=c)    
 
+		## Default Case
+		self.current_case = Interface.CASE_1
+
 		## Set Width & Height
 		self.window_width = w
 		self.window_height = h
@@ -28,13 +32,14 @@ class Interface(pyglet.window.Window):
 		self.X_ZERO = w/2
 		self.Y_ZERO = h/2
 
-		## Get Configs and object registries
-		self.Config = Config.Config(self)
-		self.case_1_objs = self.Config.config['case_1']
-		self.case_2_objs = self.Config.config['case_2']
+		## Create Batches and Groups
+		self.general_batch = pyglet.graphics.Batch()
+		self.case1_batch = pyglet.graphics.Batch()
+		self.general_labels = []
+		self.case_labels = []
 
-		## Default Case
-		self.current_case = Interface.CASE_1
+		## Get Configs and object registries
+		self.ObjReg = ObjectRegistry.ObjectRegistry(self)
 
 		## Register case triggers
 		self.periodics = Periodic(self)
@@ -42,26 +47,7 @@ class Interface(pyglet.window.Window):
 #		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
 #		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
 
-		## Batch and Group Hiearchy	
-			## General Batch
-			#	|
-			#	- background [Ordered Group]
-			#	|
-			#	- foreground [Ordered Group]
-			#
-			## Case Batch
-			#   |
-			#	- background
-			#	|
-			#   - foreground
-		## When on draw is called the general and case batch will be drawn
-
-		## Create Batches and Groups
-		self.general_batch = pyglet.graphics.Batch()
-		self.case_batch = pyglet.graphics.Batch()
-		self.general_labels = []
-		self.case_labels = []
-
+	
 		self.background_group = pyglet.graphics.OrderedGroup(0)
 		self.foreground_group = pyglet.graphics.OrderedGroup(1)
 
@@ -70,37 +56,27 @@ class Interface(pyglet.window.Window):
 		self.batch_dict['background_group'] = self.background_group
 		self.batch_dict['foreground_group'] = self.foreground_group
 
-		## Fill batches
-		tup = self.fillBatch(Interface.GENERAL)
-		self.general_batch = tup[0]
-		self.general_labels = tup[1]
-
-		tup = self.fillBatch(self.current_case)
-		self.case_batch = tup[0]
-		self.case_labels = tup[1]
-
 		## Start Periodic Functions
 		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
-		#pyglet.clock.schedule_interval(self.periodics.case_1_track_clock, 1.5)
+		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 
 	
-	def fillBatch(self, whichBatch):
+	def fillBatch(self, batch_name, batch):
 		"""
 		whichBatch: Batch to fill.
 		returns: (batch, labels) tuple
 		"""
 		logger.debug('----fillBatch----')
-		logger.debug('Filling batch: {}'.format(whichBatch))
+		logger.debug('Filling batch: {}'.format(batch_name))
 
-		this_batch = pyglet.graphics.Batch()
 		these_labels = []
 
 		## Migrate Primitives to general_batch and case_batch
 		for category in self.Config.config:			
 
-			if not (category == whichBatch): ## Continue if this category is not what we're looking for
+			if not (category == batch_name): ## Continue if this category is not what we're looking for
 				continue
-			logger.debug('category: {}, whichBatch: {}'.format(category, whichBatch))
+			#logger.debug('category: {}, batch_name: {}'.format(category, batch_name))
 
 			for group in self.Config.config[category]:
 
@@ -115,11 +91,13 @@ class Interface(pyglet.window.Window):
 				for key in self.Config.config[category][group]:
 					prim = self.Config.config[category][group][key]
 					if(isinstance(prim, pgedraw.basic.Shape)): ## If we have a primitive
-							this_batch.migrate(prim.vertex_list, prim.mode, this_group, this_batch)
+							batch.migrate(prim.vertex_list, prim.mode, this_group, batch)
 							#this_batch.add(prim.vertex_list.get_size(), prim.mode, this_group, prim.vertex_list.vertices)
+					if(isinstance(prim, pyglet.sprite.Sprite)):
+							pass
 					elif(isinstance(prim, pyglet.text.Label)): ## We have labels
-						these_labels.append(prim)
-		return (this_batch, these_labels)
+							these_labels.append(prim)
+		return (batch, these_labels)
 
 
 	def switch_state(self, switch):
@@ -130,14 +108,8 @@ class Interface(pyglet.window.Window):
 			pass#self.current_batch = 
 
 
-
 	def on_activate(self):
 		logger.debug('on_activate')
-
-	def something(self):
-		logger.debug("something!")
-	def another(self):
-		logger.debug('another!')
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		print "mouse pressed"
@@ -145,8 +117,7 @@ class Interface(pyglet.window.Window):
 	def on_draw(self):
 		self.clear()
 
-		self.general_batch.draw()
-		self.case_batch.draw()
+		self.case1_batch.draw()
 
 
 
@@ -156,9 +127,16 @@ class Periodic(object):
 	def __init__(self, interface):
 		self.interface = interface
 
-	def case_1(self, dt):
-		logger.debug("periodic: CASE_1")
-		self.interface.something()
+	def case_1_pod_motion(self, dt):
+		logger.debug("periodic: dt: {}".format(dt))
+		pod_velocity = interface.ObjReg.POD_VEL
+
+		for obj in interface.ObjReg.objects['case_1']:
+			if obj.split('_')[0] == 'pod':
+				pod = interface.ObjReg.objects['case_1'][obj]
+				pod.y += pod_velocity * dt  
+				logger.debug('pod y: {}'.format(pod.y))
+		
 
 	def case_1_track_clock(self, dt):
 		pass
@@ -173,8 +151,7 @@ if __name__ == "__main__":
 
 
 	## Create Window
-	interface = Interface(w=750, h=750, c="Interface")
-	
+	interface = Interface(w=700, h=700, c="Interface")
 
 	## Run app
 	pyglet.app.run()

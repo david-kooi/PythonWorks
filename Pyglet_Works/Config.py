@@ -3,12 +3,8 @@ import pyglet
 import logging
 
 class Config(object):
-    def createPod(self, x_pos, y_pos):
-      pod = Prims.Circle((x_pos, y_pos), 
-                  self.POD_RADIUS, 
-                  color=self.POD_COLOR, 
-                  strip=False
-                 )
+    def createSprite(self, image, x_pos, y_pos):
+      pod = pyglet.sprite.Sprite(image, x_pos, y_pos)
       return pod
 
     def createNode(self, x_pos, y_pos):
@@ -39,8 +35,10 @@ class Config(object):
         self.NODE_COLOR = (203, 26, 10, 255)
 
         ## Pod Attributes
+        self.POD_IMAGE = pyglet.image.load('./res/ball.png')
         self.POD_RADIUS = 30
         self.POD_COLOR = (255, 255, 255, 255)
+        self.POD_VEL = self.CASE_1_POD_SPACING/1 # r = d/t where t = 1s
 
 
         ## Interface Attributes
@@ -61,6 +59,10 @@ class Config(object):
         self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
         self.n_BUTTON_Y = 0 + self.Y_ZERO/4
 
+        ##Another BUtton
+        self.a_BUTTON_X = self.n_BUTTON_X
+        self.a_BUTTON_Y = self.n_BUTTON_Y + 100
+
         self.config = dict()
 
         ## Title & Control Buttons
@@ -69,9 +71,10 @@ class Config(object):
         self.config['general']['background_group']['bg'] = Prims.Rectangle((0, 0, Interface.window_width, Interface.window_height), 
                                                                                   color=self.IF_BG_COLOR, strip=False)
 
-
         self.config['general']['foreground_group'] = dict()
         self.config['general']['foreground_group']['next_button'] = Prims.Rectangle((self.n_BUTTON_X, self.n_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
+                                                                          color=self.BLUE)
+        self.config['general']['foreground_group']['another_button'] = Prims.Rectangle((self.a_BUTTON_X, self.a_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
                                                                           color=self.BLUE)
 
         self.config['general']['labels'] = dict()
@@ -104,14 +107,14 @@ class Config(object):
         self.config['case_1']['background_group']['node_1'] = self.createNode(Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
         #self.config['case_1']['background_group']['node_2'] = self.createNode(Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
         #self.config['case_1']['background_group']['node_3'] = self.createNode(Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
-       # self.config['case_1']['background_group']['node_4'] = self.createNode(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
+        #self.config['case_1']['background_group']['node_4'] = self.createNode(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
 
         ## Pods
         self.config['case_1']['foreground_group'] = dict()
-        self.config['case_1']['foreground_group']['pod_1'] = self.createPod(Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
-        self.config['case_1']['foreground_group']['pod_2'] = self.createPod(Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
-        #self.config['case_1']['foreground_group']['pod_3'] = self.createPod(Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
-        #self.config['case_1']['foreground_group']['pod_4'] = self.createPod(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
+        self.config['case_1']['background_group']['pod_1'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
+        self.config['case_1']['background_group']['pod_2'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
+        self.config['case_1']['foreground_group']['pod_3'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
+        #self.config['case_1']['foreground_group']['pod_4'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
 
 
         self.config['case_1']['functions'] = dict()
