@@ -3,86 +3,127 @@ import pyglet
 import logging
 
 class Config(object):
+    def createPod(self, x_pos, y_pos):
+      pod = Prims.Circle((x_pos, y_pos), 
+                  self.POD_RADIUS, 
+                  color=self.POD_COLOR, 
+                  strip=False
+                 )
+      return pod
+
+    def createNode(self, x_pos, y_pos):
+        node = Prims.Circle((x_pos, y_pos), 
+                  self.NODE_RADIUS, 
+                  color=self.NODE_COLOR, 
+                  strip=False
+                 )
+        return node
 
 
-	def __init__(self, Interface):
-            logging.basicConfig(level=logging.DEBUG)
-            logger = logging.getLogger('Config')
+    def __init__(self, Interface):
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger('Config')
 
 
-            ## COLORS
-            self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
-            self.TRACK_COLOR = (228, 68, 68, 255)
-            self.POD_COLOR = (255, 255, 255, 255)
-            self.BLUE = (64, 97, 228, 255)
+        ## COLORS
+        self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
+        self.TRACK_COLOR = (228, 68, 68, 255)
+        self.BLUE = (64, 97, 228, 255)
 
-            self.POD_RADIUS = 30
+        ## Case1 Attributes
+        self.CASE_1_numPods = 3
+        self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
 
-            self.X_ZERO = Interface.X_ZERO
-            self.Y_ZERO = Interface.Y_ZERO
+        ## Node Attributes
+        self.NODE_RADIUS = 15
+        self.NODE_COLOR = (203, 26, 10, 255)
 
-            self.TRACK_X = self.X_ZERO-self.POD_RADIUS
-            self.TRACK_Y = self.Y_ZERO/2
-
-            self.TRACK_WIDTH = self.POD_RADIUS*2
-            self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
-
-            self.BUTTON_HEIGHT = Interface.window_height/15
-            self.BUTTON_WIDTH = Interface.window_width/5
-
-            ##Next Button
-            self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
-            self.n_BUTTON_Y = 0 + self.Y_ZERO/4
-
-            self.config = dict()
-
-            ## Title & Control Buttons
-            self.config['general'] = dict()
-            self.config['general']['background_group'] = dict()
-            self.config['general']['background_group']['bg'] = Prims.Rectangle((0, 0, Interface.window_width, Interface.window_height), 
-                                                                                      color=self.IF_BG_COLOR, strip=False)
-      
-
-            self.config['general']['foreground_group'] = dict()
-            self.config['general']['foreground_group']['next_button'] = Prims.Rectangle((self.n_BUTTON_X, self.n_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
-                                                                              color=self.BLUE)
-
-            self.config['general']['labels'] = dict()
-            self.config['general']['labels']['title']= pyglet.text.Label('Default Title', 
-                                                                              font_name='Times New Roman', 
-                                                                              font_size=36,
-                                                                              x=self.X_ZERO, y=1.5*self.Y_ZERO)
-                                                                                                    
+        ## Pod Attributes
+        self.POD_RADIUS = 30
+        self.POD_COLOR = (255, 255, 255, 255)
 
 
-            ## Linear Motion
-            self.config['case_1'] = dict()
-            self.config['case_1']['background_group'] = dict()
-            self.config['case_1']['background_group']['POD'] = Prims.Circle((self.X_ZERO, self.Y_ZERO), 
-                                                                       self.POD_RADIUS, 
-                                                                       color=self.POD_COLOR, 
-                                                                       strip=False
-                                                                     )
+        ## Interface Attributes
+        self.X_ZERO = Interface.X_ZERO
+        self.Y_ZERO = Interface.Y_ZERO
 
-            self.config['case_1']['background_group']['TRACK'] = Prims.Rectangle((self.TRACK_X, 0, 
-                                                                                  self.TRACK_WIDTH, 
-                                                                                  self.TRACK_LENGTH), 
-                                                                                  color=self.TRACK_COLOR
-                                                                                )
-                                                                          
+        ## Track Attributes
+        self.TRACK_X = self.X_ZERO-self.POD_RADIUS
+        self.TRACK_Y = self.Y_ZERO/2
 
-            self.config['case_1']['foreground_group'] = []
+        self.TRACK_WIDTH = self.POD_RADIUS*2
+        self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
 
-            self.config['case_1']['functions'] = dict()
-            #self.config['case_1']['functions']
+        self.BUTTON_HEIGHT = Interface.window_height/15
+        self.BUTTON_WIDTH = Interface.window_width/5
 
-            ## Circular Motion
-            self.config['case_2'] = dict()
-            self.config['case_2']['background_group'] = dict()
-            self.config['case_2']['background_group']['POD'] = Prims.Circle((self.X_ZERO, self.Y_ZERO), 
-                                                                       100, 
-                                                                       color=self.POD_COLOR, 
-                                                                       strip=False
-                                                                     )        
+        ##Next Button
+        self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
+        self.n_BUTTON_Y = 0 + self.Y_ZERO/4
+
+        self.config = dict()
+
+        ## Title & Control Buttons
+        self.config['general'] = dict()
+        self.config['general']['background_group'] = dict()
+        self.config['general']['background_group']['bg'] = Prims.Rectangle((0, 0, Interface.window_width, Interface.window_height), 
+                                                                                  color=self.IF_BG_COLOR, strip=False)
+
+
+        self.config['general']['foreground_group'] = dict()
+        self.config['general']['foreground_group']['next_button'] = Prims.Rectangle((self.n_BUTTON_X, self.n_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
+                                                                          color=self.BLUE)
+
+        self.config['general']['labels'] = dict()
+        self.config['general']['labels']['title']= pyglet.text.Label('Default Title', 
+                                                                          font_name='Times New Roman', 
+                                                                          font_size=36,
+                                                                          x=self.X_ZERO, y=1.5*self.Y_ZERO)
+                                                                                                
+
+
+        ## CASE_1: Linear Motion
+        self.config['case_1'] = dict()
+
+        self.config['case_1']['labels'] = dict()
+        self.config['case_1']['labels']['title'] = pyglet.text.Label('Linear Motion', 
+                                                                          font_name='Times New Roman', 
+                                                                          font_size=36,
+                                                                          x=self.X_ZERO, y=1.5*self.Y_ZERO)
+
+        self.config['case_1']['background_group'] = dict()
+        self.config['case_1']['background_group']['track'] = Prims.Rectangle((self.TRACK_X, 0, 
+                                                                              self.TRACK_WIDTH, 
+                                                                              self.TRACK_LENGTH), 
+                                                                              color=self.TRACK_COLOR
+                                                                            )
+        
+        ## Nodes and Pods will start at the same location...the difference being that nodes are passive elements
+
+        ## Control Nodes       
+        self.config['case_1']['background_group']['node_1'] = self.createNode(Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
+        #self.config['case_1']['background_group']['node_2'] = self.createNode(Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
+        #self.config['case_1']['background_group']['node_3'] = self.createNode(Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
+       # self.config['case_1']['background_group']['node_4'] = self.createNode(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
+
+        ## Pods
+        self.config['case_1']['foreground_group'] = dict()
+        self.config['case_1']['foreground_group']['pod_1'] = self.createPod(Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
+        self.config['case_1']['foreground_group']['pod_2'] = self.createPod(Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
+        #self.config['case_1']['foreground_group']['pod_3'] = self.createPod(Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
+        #self.config['case_1']['foreground_group']['pod_4'] = self.createPod(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
+
+
+        self.config['case_1']['functions'] = dict()
+        #self.config['case_1']['functions']
+
+        ## CASE_2: Circular Motion
+        self.config['case_2'] = dict()
+        self.config['case_2']['background_group'] = dict()
+        self.config['case_2']['background_group']['POD'] = Prims.Circle((self.X_ZERO, self.Y_ZERO), 
+                                                                   100, 
+                                                                   color=self.POD_COLOR, 
+                                                                   strip=False
+                                                                 )        
 
 

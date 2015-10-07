@@ -28,8 +28,10 @@ class Interface(pyglet.window.Window):
 		self.X_ZERO = w/2
 		self.Y_ZERO = h/2
 
-		## Get Config
+		## Get Configs and object registries
 		self.Config = Config.Config(self)
+		self.case_1_objs = self.Config.config['case_1']
+		self.case_2_objs = self.Config.config['case_2']
 
 		## Default Case
 		self.current_case = Interface.CASE_1
@@ -37,8 +39,8 @@ class Interface(pyglet.window.Window):
 		## Register case triggers
 		self.periodics = Periodic(self)
 		self.case_triggers = dict()
-		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
-		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
+#		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
+#		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
 
 		## Batch and Group Hiearchy	
 			## General Batch
@@ -78,7 +80,8 @@ class Interface(pyglet.window.Window):
 		self.case_labels = tup[1]
 
 		## Start Periodic Functions
-		pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
+		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_track_clock, 1.5)
 
 	
 	def fillBatch(self, whichBatch):
@@ -89,29 +92,32 @@ class Interface(pyglet.window.Window):
 		logger.debug('----fillBatch----')
 		logger.debug('Filling batch: {}'.format(whichBatch))
 
-
-		these_labels = []
 		this_batch = pyglet.graphics.Batch()
+		these_labels = []
 
 		## Migrate Primitives to general_batch and case_batch
 		for category in self.Config.config:			
-			logger.debug('category: {}, whichBatch: {}'.format(category, whichBatch))
 
 			if not (category == whichBatch): ## Continue if this category is not what we're looking for
 				continue
+			logger.debug('category: {}, whichBatch: {}'.format(category, whichBatch))
 
 			for group in self.Config.config[category]:
 
-				try:
-					this_group = self.batch_dict[group]
-				except KeyError:
+				if group == 'background_group':
+					this_group = self.background_group
+				elif group == 'foreground_group':
+					this_group = self.foreground_group
+				else:
+					## Then we are dealing with labels
 					pass
 
 				for key in self.Config.config[category][group]:
 					prim = self.Config.config[category][group][key]
 					if(isinstance(prim, pgedraw.basic.Shape)): ## If we have a primitive
 							this_batch.migrate(prim.vertex_list, prim.mode, this_group, this_batch)
-					elif(isinstance(prim, pyglet.text.Label)):
+							#this_batch.add(prim.vertex_list.get_size(), prim.mode, this_group, prim.vertex_list.vertices)
+					elif(isinstance(prim, pyglet.text.Label)): ## We have labels
 						these_labels.append(prim)
 		return (this_batch, these_labels)
 
