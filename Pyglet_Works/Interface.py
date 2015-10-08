@@ -33,6 +33,8 @@ class Interface(pyglet.window.Window):
 		self.Y_ZERO = h/2
 
 		## Create Batches and Groups
+		self.background_group = pyglet.graphics.OrderedGroup(0)
+		self.foreground_group = pyglet.graphics.OrderedGroup(1)
 		self.general_batch = pyglet.graphics.Batch()
 		self.case1_batch = pyglet.graphics.Batch()
 		self.general_labels = []
@@ -47,10 +49,6 @@ class Interface(pyglet.window.Window):
 		self.case_triggers = dict()
 #		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
 #		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
-
-	
-		self.background_group = pyglet.graphics.OrderedGroup(0)
-		self.foreground_group = pyglet.graphics.OrderedGroup(1)
 
 		## Create a way to access the groups
 		self.batch_dict = dict()
@@ -139,15 +137,17 @@ class Periodic(object):
 		#logger.debug("periodic: dt: {}".format(dt))
 		pod_velocity = self.config.POD_VEL
 
-		for obj in interface.ObjReg.objects['case_1']:
-			if obj.split('_')[0] == 'pod':
-				pod = interface.ObjReg.objects['case_1'][obj]
-				pod.y += pod_velocity * dt  
+		for pod in interface.ObjReg.pod_registry:
+				logger.debug('pod: {}'.format(pod.ID))
+			     #   logger.debug('old pos: {}'.format(pod.SPRITE.y))
+				#newPosition = pod.Y_POS + (pod_velocity * dt)
+				#logger.debug('new pos: {}'.format(newPosition))
+				pod.SPRITE.y += pod.velocity * dt
 				#logger.debug('batch: '.format(pod.batch))
-				#logger.debug('pod y: {}'.format(pod.y))
+				logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
-				if pod.y >= self.interface.window_height + pod.height/2:
-					pod.y = 0
+				if pod.SPRITE.y >= self.interface.window_height + pod.SPRITE.height/2:
+					pod.SPRITE.y = 0
 		
 
 	def case_1_track_clock(self, dt):

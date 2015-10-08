@@ -13,6 +13,10 @@ class Config(object):
           ## Batches
           self.CASE_1_BATCH = Interface.case1_batch
 
+          #Groups
+          self.CASE_1_F_GROUP = Interface.foreground_group
+          self.CASE_1_B_GROUP = Interface.background_group
+
           ## COLORS
           self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
           self.TRACK_COLOR = (228, 68, 68, 255)
@@ -58,20 +62,20 @@ class Config(object):
           self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
           self.n_BUTTON_Y = 0 + self.Y_ZERO/4
   
-          ##Another BUtton
+          ##Another Button
           self.a_BUTTON_X = self.n_BUTTON_X
           self.a_BUTTON_Y = self.n_BUTTON_Y + 100
   
   
     def __init__(self, Interface=None):
-      
+        print '----Creating Config----'
         if Config.instance == None:
-            print 'instance is none'
+            print 'Config instance is none'
             #if Interface == None:
             # raise Exception ## Must be first inialized with an Interface
             Config.instance = Config.__Config(Interface=Interface) 
         else:
-            print 'instance exists'
+            print 'Config instance exists'
         
 
     def __getattr__(self, name):
