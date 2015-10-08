@@ -39,6 +39,7 @@ class Interface(pyglet.window.Window):
 		self.case_labels = []
 
 		## Get Configs and object registries
+		self.configuration = Config.Config(Interface=self)
 		self.ObjReg = ObjectRegistry.ObjectRegistry(self)
 
 		## Register case triggers
@@ -109,7 +110,14 @@ class Interface(pyglet.window.Window):
 
 
 	def on_activate(self):
-		logger.debug('on_activate')
+		logger.debug('----on_activate----')
+	def on_close(self):
+		logger.debug('----on_close----')
+		## Delete all objects
+		for obj_name, obj in self.ObjReg.objects:
+			if isinstance(obj, pyglet.sprite.Sprite):
+				obj.delete()
+
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		print "mouse pressed"
@@ -121,21 +129,25 @@ class Interface(pyglet.window.Window):
 
 
 
-
 ## Class containing periodic function for an Interface
 class Periodic(object):
 	def __init__(self, interface):
 		self.interface = interface
+		self.config = Config.Config()
 
 	def case_1_pod_motion(self, dt):
-		logger.debug("periodic: dt: {}".format(dt))
-		pod_velocity = interface.ObjReg.POD_VEL
+		#logger.debug("periodic: dt: {}".format(dt))
+		pod_velocity = self.config.POD_VEL
 
 		for obj in interface.ObjReg.objects['case_1']:
 			if obj.split('_')[0] == 'pod':
 				pod = interface.ObjReg.objects['case_1'][obj]
 				pod.y += pod_velocity * dt  
-				logger.debug('pod y: {}'.format(pod.y))
+				#logger.debug('batch: '.format(pod.batch))
+				#logger.debug('pod y: {}'.format(pod.y))
+
+				if pod.y >= self.interface.window_height + pod.height/2:
+					pod.y = 0
 		
 
 	def case_1_track_clock(self, dt):

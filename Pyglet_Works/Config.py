@@ -3,130 +3,76 @@ import pyglet
 import logging
 
 class Config(object):
-    def createSprite(self, image, x_pos, y_pos):
-      pod = pyglet.sprite.Sprite(image, x_pos, y_pos)
-      return pod
+    instance = None
 
-    def createNode(self, x_pos, y_pos):
-        node = Prims.Circle((x_pos, y_pos), 
-                  self.NODE_RADIUS, 
-                  color=self.NODE_COLOR, 
-                  strip=False
-                 )
-        return node
+    class __Config(object):
+      def __init__(self, Interface=None):
+          logging.basicConfig(level=logging.DEBUG)
+          logger = logging.getLogger('Config')
 
+          ## Batches
+          self.CASE_1_BATCH = Interface.case1_batch
 
-    def __init__(self, Interface):
-        logging.basicConfig(level=logging.DEBUG)
-        logger = logging.getLogger('Config')
+          ## COLORS
+          self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
+          self.TRACK_COLOR = (228, 68, 68, 255)
+          self.BLUE = (64, 97, 228, 255)
 
+          ## Case1 Attributes
+          self.CASE_1_numPods = 3
+          self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
 
-        ## COLORS
-        self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
-        self.TRACK_COLOR = (228, 68, 68, 255)
-        self.BLUE = (64, 97, 228, 255)
+          ## Node Attributes
+          self.NODE_RADIUS = 15
+          self.NODE_COLOR = (203, 26, 10, 255)
 
-        ## Case1 Attributes
-        self.CASE_1_numPods = 3
-        self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
+          ## Pod Attributes
+          self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
+          self.POD_IMAGE.anchor_x = self.POD_IMAGE.width // 2 ## Set anchor point to middle of image
+          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height // 2 
 
-        ## Node Attributes
-        self.NODE_RADIUS = 15
-        self.NODE_COLOR = (203, 26, 10, 255)
+          ## Track Attributes
+          self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
+          self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width // 2 ## Set anchor point to middle of image
+          self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height // 2         
 
-        ## Pod Attributes
-        self.POD_IMAGE = pyglet.image.load('./res/ball.png')
-        self.POD_RADIUS = 30
-        self.POD_COLOR = (255, 255, 255, 255)
-        self.POD_VEL = self.CASE_1_POD_SPACING/1 # r = d/t where t = 1s
-
-
-        ## Interface Attributes
-        self.X_ZERO = Interface.X_ZERO
-        self.Y_ZERO = Interface.Y_ZERO
-
-        ## Track Attributes
-        self.TRACK_X = self.X_ZERO-self.POD_RADIUS
-        self.TRACK_Y = self.Y_ZERO/2
-
-        self.TRACK_WIDTH = self.POD_RADIUS*2
-        self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
-
-        self.BUTTON_HEIGHT = Interface.window_height/15
-        self.BUTTON_WIDTH = Interface.window_width/5
-
-        ##Next Button
-        self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
-        self.n_BUTTON_Y = 0 + self.Y_ZERO/4
-
-        ##Another BUtton
-        self.a_BUTTON_X = self.n_BUTTON_X
-        self.a_BUTTON_Y = self.n_BUTTON_Y + 100
-
-        self.config = dict()
-
-        ## Title & Control Buttons
-        self.config['general'] = dict()
-        self.config['general']['background_group'] = dict()
-        self.config['general']['background_group']['bg'] = Prims.Rectangle((0, 0, Interface.window_width, Interface.window_height), 
-                                                                                  color=self.IF_BG_COLOR, strip=False)
-
-        self.config['general']['foreground_group'] = dict()
-        self.config['general']['foreground_group']['next_button'] = Prims.Rectangle((self.n_BUTTON_X, self.n_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
-                                                                          color=self.BLUE)
-        self.config['general']['foreground_group']['another_button'] = Prims.Rectangle((self.a_BUTTON_X, self.a_BUTTON_Y, self.BUTTON_WIDTH, self.BUTTON_HEIGHT),
-                                                                          color=self.BLUE)
-
-        self.config['general']['labels'] = dict()
-        self.config['general']['labels']['title']= pyglet.text.Label('Default Title', 
-                                                                          font_name='Times New Roman', 
-                                                                          font_size=36,
-                                                                          x=self.X_ZERO, y=1.5*self.Y_ZERO)
-                                                                                                
-
-
-        ## CASE_1: Linear Motion
-        self.config['case_1'] = dict()
-
-        self.config['case_1']['labels'] = dict()
-        self.config['case_1']['labels']['title'] = pyglet.text.Label('Linear Motion', 
-                                                                          font_name='Times New Roman', 
-                                                                          font_size=36,
-                                                                          x=self.X_ZERO, y=1.5*self.Y_ZERO)
-
-        self.config['case_1']['background_group'] = dict()
-        self.config['case_1']['background_group']['track'] = Prims.Rectangle((self.TRACK_X, 0, 
-                                                                              self.TRACK_WIDTH, 
-                                                                              self.TRACK_LENGTH), 
-                                                                              color=self.TRACK_COLOR
-                                                                            )
+          self.POD_RADIUS = 30
+          self.POD_COLOR = (255, 255, 255, 255)
+          self.POD_VEL = self.CASE_1_POD_SPACING/1 # r = d/t where t = 1s
+  
+          ## Interface Attributes
+          self.X_ZERO = Interface.X_ZERO
+          self.Y_ZERO = Interface.Y_ZERO
+  
+          ## Track Attributes
+          self.TRACK_X = self.X_ZERO-self.POD_RADIUS
+          self.TRACK_Y = self.Y_ZERO/2
+  
+          self.TRACK_WIDTH = self.POD_RADIUS*2
+          self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
+  
+          self.BUTTON_HEIGHT = Interface.window_height/15
+          self.BUTTON_WIDTH = Interface.window_width/5
+  
+          ##Next Button
+          self.n_BUTTON_X = self.X_ZERO + self.X_ZERO/2
+          self.n_BUTTON_Y = 0 + self.Y_ZERO/4
+  
+          ##Another BUtton
+          self.a_BUTTON_X = self.n_BUTTON_X
+          self.a_BUTTON_Y = self.n_BUTTON_Y + 100
+  
+  
+    def __init__(self, Interface=None):
+      
+        if Config.instance == None:
+            print 'instance is none'
+            #if Interface == None:
+            # raise Exception ## Must be first inialized with an Interface
+            Config.instance = Config.__Config(Interface=Interface) 
+        else:
+            print 'instance exists'
         
-        ## Nodes and Pods will start at the same location...the difference being that nodes are passive elements
 
-        ## Control Nodes       
-        self.config['case_1']['background_group']['node_1'] = self.createNode(Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
-        #self.config['case_1']['background_group']['node_2'] = self.createNode(Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
-        #self.config['case_1']['background_group']['node_3'] = self.createNode(Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
-        #self.config['case_1']['background_group']['node_4'] = self.createNode(Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
-
-        ## Pods
-        self.config['case_1']['foreground_group'] = dict()
-        self.config['case_1']['background_group']['pod_1'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 0 * self.CASE_1_POD_SPACING) 
-        self.config['case_1']['background_group']['pod_2'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 1 * self.CASE_1_POD_SPACING)
-        self.config['case_1']['foreground_group']['pod_3'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 2 * self.CASE_1_POD_SPACING)
-        #self.config['case_1']['foreground_group']['pod_4'] = self.createPod(self.POD_IMAGE, Interface.X_ZERO, 3 * self.CASE_1_POD_SPACING)
-
-
-        self.config['case_1']['functions'] = dict()
-        #self.config['case_1']['functions']
-
-        ## CASE_2: Circular Motion
-        self.config['case_2'] = dict()
-        self.config['case_2']['background_group'] = dict()
-        self.config['case_2']['background_group']['POD'] = Prims.Circle((self.X_ZERO, self.Y_ZERO), 
-                                                                   100, 
-                                                                   color=self.POD_COLOR, 
-                                                                   strip=False
-                                                                 )        
-
-
+    def __getattr__(self, name):
+        return getattr(Config.instance, name)
