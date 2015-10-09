@@ -1,9 +1,17 @@
 
 import logging
+import pyglet
+
+class Clock(pyglet.event.EventDispatcher):
+    def __init__(self):
+        Clock.register_event_type('pulse')
+    def startPulse(self):
+        self.dispatch_event('pulse')
+
 
 class Pod(object):
 
-    def __init__(self, sprite, pod_ahead, default_velocity, ID):
+    def __init__(self, sprite, pod_ahead, pod_behind, default_velocity, ID):
     	logging.basicConfig(level=logging.DEBUG)
         self.logger = logging.getLogger('Config')
 
@@ -12,6 +20,7 @@ class Pod(object):
         self.X_POS = self.SPRITE.x
         self.DEF_VELOCITY = default_velocity
         self.POD_AHEAD = pod_ahead
+        self.POD_BEHIND = pod_behind
         self.ID = ID
 
         ## Pod States
@@ -36,5 +45,16 @@ class Pod(object):
     		self.velocity =+ 1
     	else:
     		self.velocity = self.DEF_VELOCITY
+
+class Node(object):
+    def __init__(self, clock):
+        self.clock = clock
+        self.clock.push_handlers(self)
+    def pulse(self):
+
+
+
+
+
 
 

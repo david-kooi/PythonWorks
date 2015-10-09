@@ -2,7 +2,7 @@ from pgedraw import basic as Prims #Primatives
 import pyglet
 import logging
 import Config
-import Pod
+from Structures import Pod
 
 class ObjectRegistry(object):
 
@@ -41,22 +41,25 @@ class ObjectRegistry(object):
 
             ## Attach to registry
             list_index = len(self.pod_registry)
-            pod = Pod.Pod(sprite, pod_ahead=None, default_velocity=self.config.POD_VEL, ID=list_index)
+            pod = Pod(sprite, pod_ahead=None, pod_behind=None, default_velocity=self.config.POD_VEL, ID=list_index)
             self.pod_registry.append(pod)
 
             self.logger.debug('----pod created----')
-            self.logger.debug('pod x: {} | pod y: {}'.format(pod.X_POS, pod.Y_POS))
+            self.logger.debug('pod x: {} | pod y: {}'.format(pod.SPRITE.x, pod.SPRITE.y))
 
         def linkPods(self):
             ## Link pods
             for idx, pod in enumerate(self.pod_registry):
                   if pod == self.pod_registry[-1]:
                         pod.pod_ahead = self.pod_registry[0]
+                        pod.pod_behind = self.pod_registry[-2]
                   else:
                         pod.pod_ahead = self.pod_registry[idx+1]
+                        pod.pod_behind = self.pod_registry[idx-1]
 
                   self.logger.debug('pod: {}'.format(pod.ID))
                   self.logger.debug('pod_ahead: {}'.format(pod.pod_ahead.ID))
+                  self.logger.debug('pod_behind: {}'.format(pod.pod_behind.ID))
 
 
 
@@ -65,5 +68,5 @@ class ObjectRegistry(object):
             track.scale = 1
 
             self.logger.debug('----track created----')
-            self.logger.debug('track x: {} | pod y: {}'.format(track.x, track.y))
+            self.logger.debug('track x: {} | track y: {}'.format(track.x, track.y))
             return track

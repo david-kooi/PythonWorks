@@ -10,6 +10,10 @@ class Config(object):
           logging.basicConfig(level=logging.DEBUG)
           logger = logging.getLogger('Config')
 
+
+          self.INTERFACE_HEIGHT = Interface.window_height
+          self.INTERFACE_WIDTH = Interface.window_width
+
           ## Batches
           self.CASE_1_BATCH = Interface.case1_batch
 

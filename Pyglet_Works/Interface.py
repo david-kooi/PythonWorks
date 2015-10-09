@@ -3,9 +3,12 @@ from pyglet.window import key
 from pgedraw import basic as Prims #Primatives
 import pgedraw
 
-import Config
+from Structures import Pod
+from Structures import Clock
+from Structures import Node
 import ObjectRegistry
 import logging
+import Config
 
 ## Subclass window
 class Interface(pyglet.window.Window):
@@ -19,7 +22,14 @@ class Interface(pyglet.window.Window):
 
 	def __init__(self, w, h, c):
 		logger.debug("__init__")
+		logger.debug('window_width: {}'.format(w))
+		logger.debug('window_height: {}'.format(h))
+
 		pyglet.window.Window.__init__(self, width=w, height=h, caption=c)    
+
+		## Clock Instance
+		self.clock = Clock()
+		self.test_node = Node(self.clock)
 
 		## Default Case
 		self.current_case = Interface.CASE_1
@@ -58,6 +68,8 @@ class Interface(pyglet.window.Window):
 		## Start Periodic Functions
 		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_auto_adjust, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_clock_ticker, 1)
 
 	
 	def fillBatch(self, batch_name, batch):
@@ -112,9 +124,8 @@ class Interface(pyglet.window.Window):
 	def on_close(self):
 		logger.debug('----on_close----')
 		## Delete all objects
-		for obj_name, obj in self.ObjReg.objects:
-			if isinstance(obj, pyglet.sprite.Sprite):
-				obj.delete()
+		for pods in self.ObjReg.pod_registry:
+			pod.SPRITE.delete()
 
 
 	def on_mouse_press(self, x, y, button, modifiers):
@@ -138,20 +149,39 @@ class Periodic(object):
 		pod_velocity = self.config.POD_VEL
 
 		for pod in interface.ObjReg.pod_registry:
-				logger.debug('pod: {}'.format(pod.ID))
+				#logger.debug('pod: {}'.format(pod.ID))
 			     #   logger.debug('old pos: {}'.format(pod.SPRITE.y))
 				#newPosition = pod.Y_POS + (pod_velocity * dt)
 				#logger.debug('new pos: {}'.format(newPosition))
 				pod.SPRITE.y += pod.velocity * dt
-				#logger.debug('batch: '.format(pod.batch))
-				logger.debug('pod y: {}'.format(pod.SPRITE.y))
+				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
 				if pod.SPRITE.y >= self.interface.window_height + pod.SPRITE.height/2:
 					pod.SPRITE.y = 0
+	
+	def case_1_auto_adjust(self, dt):
+		for pod in interface.ObjReg.pod_registry:
+			distance_ahead = pod.pod_ahead.SPRITE.y - pod.SPRITE.y 
+			distance_behind = pod.SPRITE.y - pod.pod_behind.SPRITE.y
+	
+			if distance_ahead < 0:
+				to_top = self.config.INTERFACE_HEIGHT - pod.SPRITE.y
+				to_bottom = pod.pod_ahead.SPRITE.y
+				distance_ahead = to_top + to_bottom
+			if distance_behind < 0:
+				to_top = self.config.INTERFACE_HEIGHT - pod.pod_behind.SPRITE.y
+				to_bottom = pod.SPRITE.y
+				distance_behind = to_top + to_bottom
+
+
+			logger.debug('pod: {}'.format(pod.ID))
+			logger.debug('dist ahead: {}'.format(distance_ahead))
+			logger.debug('dist behind: {}'.format(distance_behind))
 		
 
-	def case_1_track_clock(self, dt):
-		pass
+
+	def case_1_clock_ticker(self, dt):
+		self.interface.clock.startPulse()
 	
 	def case_2(self, dt):
 		logger.debug('periodic: CASE_2')
