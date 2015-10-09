@@ -33,6 +33,9 @@ class Config(object):
           ## Node Attributes
           self.NODE_RADIUS = 15
           self.NODE_COLOR = (203, 26, 10, 255)
+          self.CASE_1_NODE_START = 50
+          self.CASE_1_numNodes = 2
+          self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
 
           ## Pod Attributes
           self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
@@ -42,7 +45,15 @@ class Config(object):
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
           self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width // 2 ## Set anchor point to middle of image
-          self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height // 2         
+          self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height // 2    
+
+          ## Node Attributes
+          self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
+          self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width // 2
+          self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height // 2
+
+
+
 
           self.POD_RADIUS = 30
           self.POD_COLOR = (255, 255, 255, 255)

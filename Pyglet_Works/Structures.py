@@ -13,7 +13,7 @@ class Pod(object):
 
     def __init__(self, sprite, pod_ahead, pod_behind, default_velocity, ID):
     	logging.basicConfig(level=logging.DEBUG)
-        self.logger = logging.getLogger('Config')
+        self.logger = logging.getLogger('POD')
 
         self.SPRITE = sprite 
         self.Y_POS = self.SPRITE.y
@@ -47,11 +47,21 @@ class Pod(object):
     		self.velocity = self.DEF_VELOCITY
 
 class Node(object):
-    def __init__(self, clock):
+    def __init__(self, sprite, clock, ID):
+        logging.basicConfig(level=logging.DEBUG)
+        self.logger = logging.getLogger('NODE')
+
+
         self.clock = clock
         self.clock.push_handlers(self)
-    def pulse(self):
 
+
+        self.ID = ID
+
+        self.SPRITE = sprite
+    def pulse(self):
+        self.logger.debug('NODE {} PULSED'.format(self.ID))
+        
 
 
 

@@ -2,12 +2,17 @@ from pgedraw import basic as Prims #Primatives
 import pyglet
 import logging
 import Config
+from Structures import Node
 from Structures import Pod
 
 class ObjectRegistry(object):
 
 	def __init__(self, Interface):
             logging.basicConfig(level=logging.DEBUG)
+
+            self.interface = Interface
+
+
             self.logger = logging.getLogger('ObjectRegistry')
             self.logger.debug('ObjectRegistry')
             self.logger.debug('__init__')
@@ -15,23 +20,33 @@ class ObjectRegistry(object):
             ## Get Config
             self.config = Config.Config()
 
-            ## POD REGISTRY
+            ## Object Registers
             self.pod_registry = []
+            self.node_registry = []
+            self.general_registry = []
 
             ## Object Dictionary
             self.objects = dict()
             self.objects['case_1'] = dict()
 
             ## Pods
-            self.objects['case_1']['pod_1'] = self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            self.objects['case_1']['pod_2'] = self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            self.objects['case_1']['pod_3'] = self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            #self.objects['case_1']['pod_4'] = self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.CASE_1_F_GROUP)
+            self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
+            self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
+            self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
+            #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.CASE_1_F_GROUP)
 
             self.linkPods()
 
+            ## Nodes
+            start_pos = self.config.CASE_1_NODE_SPACING + self.config.CASE_1_NODE_START
+            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
+            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
+
+
+
+
             ## Track
-            self.objects['case_1']['track'] = self.createTrack(self.config.X_ZERO, self.config.Y_ZERO, self.config.CASE_1_BATCH, self.config.CASE_1_B_GROUP)
+            self.createTrack(self.config.X_ZERO, self.config.Y_ZERO, self.config.CASE_1_BATCH, self.config.CASE_1_B_GROUP)
 
 
 	def createPod(self, x, y, case_batch, case_group):
@@ -67,6 +82,18 @@ class ObjectRegistry(object):
             track = pyglet.sprite.Sprite(self.config.TRACK_IMAGE, x, y, batch=case_batch, group=case_group)
             track.scale = 1
 
+            self.general_registry.append(track)
+
             self.logger.debug('----track created----')
             self.logger.debug('track x: {} | track y: {}'.format(track.x, track.y))
-            return track
+        def createNode(self, x, y, case_batch, case_group, ID):
+            sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
+            sprite.scale = .45
+
+            node = Node(sprite, self.interface.clock, ID=ID)
+
+
+            self.logger.debug('----node created----')
+            self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))
+            return node
+

@@ -29,7 +29,6 @@ class Interface(pyglet.window.Window):
 
 		## Clock Instance
 		self.clock = Clock()
-		self.test_node = Node(self.clock)
 
 		## Default Case
 		self.current_case = Interface.CASE_1
