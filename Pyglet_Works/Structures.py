@@ -1,6 +1,7 @@
 
 import logging
 import pyglet
+import time
 
 class Clock(pyglet.event.EventDispatcher):
     def __init__(self):

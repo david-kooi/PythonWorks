@@ -70,45 +70,6 @@ class Interface(pyglet.window.Window):
 		pyglet.clock.schedule_interval(self.periodics.case_1_auto_adjust, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_clock_ticker, 1)
 
-	
-	def fillBatch(self, batch_name, batch):
-		"""
-		whichBatch: Batch to fill.
-		returns: (batch, labels) tuple
-		"""
-		logger.debug('----fillBatch----')
-		logger.debug('Filling batch: {}'.format(batch_name))
-
-		these_labels = []
-
-		## Migrate Primitives to general_batch and case_batch
-		for category in self.Config.config:			
-
-			if not (category == batch_name): ## Continue if this category is not what we're looking for
-				continue
-			#logger.debug('category: {}, batch_name: {}'.format(category, batch_name))
-
-			for group in self.Config.config[category]:
-
-				if group == 'background_group':
-					this_group = self.background_group
-				elif group == 'foreground_group':
-					this_group = self.foreground_group
-				else:
-					## Then we are dealing with labels
-					pass
-
-				for key in self.Config.config[category][group]:
-					prim = self.Config.config[category][group][key]
-					if(isinstance(prim, pgedraw.basic.Shape)): ## If we have a primitive
-							batch.migrate(prim.vertex_list, prim.mode, this_group, batch)
-							#this_batch.add(prim.vertex_list.get_size(), prim.mode, this_group, prim.vertex_list.vertices)
-					if(isinstance(prim, pyglet.sprite.Sprite)):
-							pass
-					elif(isinstance(prim, pyglet.text.Label)): ## We have labels
-							these_labels.append(prim)
-		return (batch, these_labels)
-
 
 	def switch_state(self, switch):
 		logger.debug('switch_state')
