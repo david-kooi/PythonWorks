@@ -29,6 +29,8 @@ class Config(object):
           ## Case1 Attributes
           self.CASE_1_numPods = 3
           self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
+          self.PULSE_WIDTH = 1
+          self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 5 # Distance in time
 
           ## Node Attributes
           self.NODE_RADIUS = 15
@@ -37,10 +39,15 @@ class Config(object):
           self.CASE_1_numNodes = 2
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
 
+
           ## Pod Attributes
           self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
           self.POD_IMAGE.anchor_x = self.POD_IMAGE.width // 2 ## Set anchor point to middle of image
           self.POD_IMAGE.anchor_y = self.POD_IMAGE.height // 2 
+
+          self.POD_RADIUS = 30
+          self.POD_COLOR = (255, 255, 255, 255)
+          self.POD_VEL = self.CASE_1_NODE_SPACING/(self.NODE_TIME_DISTANCE) # r = d/t where t = 1s
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
@@ -51,13 +58,6 @@ class Config(object):
           self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
           self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width // 2
           self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height // 2
-
-
-
-
-          self.POD_RADIUS = 30
-          self.POD_COLOR = (255, 255, 255, 255)
-          self.POD_VEL = self.CASE_1_POD_SPACING/1 # r = d/t where t = 1s
   
           ## Interface Attributes
           self.X_ZERO = Interface.X_ZERO

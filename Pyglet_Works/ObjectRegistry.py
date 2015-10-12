@@ -29,6 +29,13 @@ class ObjectRegistry(object):
             self.objects = dict()
             self.objects['case_1'] = dict()
 
+
+            ## Nodes
+            start_pos = self.config.CASE_1_NODE_SPACING #+ self.config.CASE_1_NODE_START
+            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
+            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
+            self.createNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=2)
+
             ## Pods
             self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
             self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
@@ -36,13 +43,6 @@ class ObjectRegistry(object):
             #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.CASE_1_F_GROUP)
 
             self.linkPods()
-
-            ## Nodes
-            start_pos = self.config.CASE_1_NODE_SPACING + self.config.CASE_1_NODE_START
-            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
-            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
-
-
 
 
             ## Track
@@ -63,7 +63,6 @@ class ObjectRegistry(object):
             self.logger.debug('pod x: {} | pod y: {}'.format(pod.SPRITE.x, pod.SPRITE.y))
 
         def linkPods(self):
-            ## Link pods
             for idx, pod in enumerate(self.pod_registry):
                   if pod == self.pod_registry[-1]:
                         pod.pod_ahead = self.pod_registry[0]
@@ -90,8 +89,8 @@ class ObjectRegistry(object):
             sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
             sprite.scale = .45
 
-            node = Node(sprite, self.interface.clock, ID=ID)
-
+            node = Node(self.node_registry, sprite, self.interface.master_clock, ID=ID)
+            self.node_registry.append(node)
 
             self.logger.debug('----node created----')
             self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))

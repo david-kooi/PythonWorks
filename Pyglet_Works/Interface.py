@@ -28,7 +28,7 @@ class Interface(pyglet.window.Window):
 		pyglet.window.Window.__init__(self, width=w, height=h, caption=c)    
 
 		## Clock Instance
-		self.clock = Clock()
+		self.master_clock = Clock()
 
 		## Default Case
 		self.current_case = Interface.CASE_1
@@ -66,17 +66,11 @@ class Interface(pyglet.window.Window):
 
 		## Start Periodic Functions
 		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
+		pyglet.clock.schedule_once(self.periodics.case_1_node_pod_link, 0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_auto_adjust, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_clock_ticker, 1)
-
-
-	def switch_state(self, switch):
-		logger.debug('switch_state')
-		if(switch == Interface.CASE_1):
-			pass#self.current_batch = 
-		if(switch == Interface.CASE_2):
-			pass#self.current_batch = 
+		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_engage_node_state_machine, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
 
 
 	def on_activate(self):
@@ -84,16 +78,14 @@ class Interface(pyglet.window.Window):
 	def on_close(self):
 		logger.debug('----on_close----')
 		## Delete all objects
-		for pods in self.ObjReg.pod_registry:
-			pod.SPRITE.delete()
-
+		#for pods in self.ObjReg.pod_registry:
+	#		pod.SPRITE.delete()
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		print "mouse pressed"
 
 	def on_draw(self):
 		self.clear()
-
 		self.case1_batch.draw()
 
 
@@ -104,48 +96,48 @@ class Periodic(object):
 		self.interface = interface
 		self.config = Config.Config()
 
+	def case_1_node_pod_link(self, dt):
+		logger.debug('----node pod link----')
+		for idx,pod in enumerate(self.interface.ObjReg.pod_registry):
+			pod.NODE_AHEAD = self.interface.ObjReg.node_registry[idx]
+			pod.NODE_AHEAD.registerNextPod(self)
+
 	def case_1_pod_motion(self, dt):
 		#logger.debug("periodic: dt: {}".format(dt))
 		pod_velocity = self.config.POD_VEL
 
 		for pod in interface.ObjReg.pod_registry:
+
 				#logger.debug('pod: {}'.format(pod.ID))
+				#logger.debug('next node: {}'.format(pod.NODE_AHEAD.ID))
 			     #   logger.debug('old pos: {}'.format(pod.SPRITE.y))
 				#newPosition = pod.Y_POS + (pod_velocity * dt)
 				#logger.debug('new pos: {}'.format(newPosition))
+
 				pod.SPRITE.y += pod.velocity * dt
 				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
 				if pod.SPRITE.y >= self.interface.window_height + pod.SPRITE.height/2:
 					pod.SPRITE.y = 0
-	
-	def case_1_auto_adjust(self, dt):
+	def case_1_engage_node_state_machine(self, dt):
+		for node in interface.ObjReg.node_registry:
+			node.engageStateMachine()
+	def case_1_check_pod_contact(self, dt):
 		for pod in interface.ObjReg.pod_registry:
-			distance_ahead = pod.pod_ahead.SPRITE.y - pod.SPRITE.y 
-			distance_behind = pod.SPRITE.y - pod.pod_behind.SPRITE.y
+			pod_y = pod.SPRITE.y
+			node_y = pod.NODE_AHEAD.SPRITE.y
+			#logger.debug('pod_y: {}'.format(pod_y))
+			#logger.debug('node_y: {}'.format(node_y))
+
+			distance = abs(pod_y - node_y)
+			logger.debug('distance: {}'.format(distance))
+			if distance < 20:
+				logger.debug('CONTACT')
+				pod.NODE_AHEAD.POD_CONTACT = True
+
+	def case_1_master_clock_ticker(self, dt):
+		self.interface.master_clock.startPulse()
 	
-			if distance_ahead < 0:
-				to_top = self.config.INTERFACE_HEIGHT - pod.SPRITE.y
-				to_bottom = pod.pod_ahead.SPRITE.y
-				distance_ahead = to_top + to_bottom
-			if distance_behind < 0:
-				to_top = self.config.INTERFACE_HEIGHT - pod.pod_behind.SPRITE.y
-				to_bottom = pod.SPRITE.y
-				distance_behind = to_top + to_bottom
-
-
-			logger.debug('pod: {}'.format(pod.ID))
-			logger.debug('dist ahead: {}'.format(distance_ahead))
-			logger.debug('dist behind: {}'.format(distance_behind))
-		
-
-
-	def case_1_clock_ticker(self, dt):
-		self.interface.clock.startPulse()
-	
-	def case_2(self, dt):
-		logger.debug('periodic: CASE_2')
-		self.interface.another()
 
 if __name__ == "__main__":
 	logging.basicConfig(level=logging.DEBUG)
