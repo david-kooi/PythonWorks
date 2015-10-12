@@ -8,7 +8,7 @@ class Config(object):
     class __Config(object):
       def __init__(self, Interface=None):
           logging.basicConfig(level=logging.DEBUG)
-          logger = logging.getLogger('Config')
+          self.logger = logging.getLogger('Config')
 
 
           self.INTERFACE_HEIGHT = Interface.window_height
@@ -25,18 +25,19 @@ class Config(object):
           self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
           self.TRACK_COLOR = (228, 68, 68, 255)
           self.BLUE = (64, 97, 228, 255)
+          self.BLACK = (0,0,0,0)
 
           ## Case1 Attributes
-          self.CASE_1_numPods = 3
+          self.CASE_1_numPods = 1
           self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
           self.PULSE_WIDTH = 1
-          self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 5 # Distance in time
+          self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 1 # Distance in time
 
           ## Node Attributes
           self.NODE_RADIUS = 15
           self.NODE_COLOR = (203, 26, 10, 255)
           self.CASE_1_NODE_START = 50
-          self.CASE_1_numNodes = 2
+          self.CASE_1_numNodes = 1
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
 
 
@@ -48,6 +49,7 @@ class Config(object):
           self.POD_RADIUS = 30
           self.POD_COLOR = (255, 255, 255, 255)
           self.POD_VEL = self.CASE_1_NODE_SPACING/(self.NODE_TIME_DISTANCE) # r = d/t where t = 1s
+          self.logger.debug('POD_VEL: {}'.format(self.POD_VEL))
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')

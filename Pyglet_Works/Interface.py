@@ -66,10 +66,10 @@ class Interface(pyglet.window.Window):
 
 		## Start Periodic Functions
 		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
-		pyglet.clock.schedule_once(self.periodics.case_1_node_pod_link, 0)
+		#pyglet.clock.schedule_once(self.periodics.case_1_node_pod_link, 0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_engage_node_state_machine, 1/60.0)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_engage_node_state_machine, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
 
 
@@ -113,27 +113,22 @@ class Periodic(object):
 			     #   logger.debug('old pos: {}'.format(pod.SPRITE.y))
 				#newPosition = pod.Y_POS + (pod_velocity * dt)
 				#logger.debug('new pos: {}'.format(newPosition))
-
-				pod.SPRITE.y += pod.velocity * dt
+				pod.move(dt)
 				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
 				if pod.SPRITE.y >= self.interface.window_height + pod.SPRITE.height/2:
 					pod.SPRITE.y = 0
+
 	def case_1_engage_node_state_machine(self, dt):
 		for node in interface.ObjReg.node_registry:
 			node.engageStateMachine()
-	def case_1_check_pod_contact(self, dt):
-		for pod in interface.ObjReg.pod_registry:
-			pod_y = pod.SPRITE.y
-			node_y = pod.NODE_AHEAD.SPRITE.y
-			#logger.debug('pod_y: {}'.format(pod_y))
-			#logger.debug('node_y: {}'.format(node_y))
 
-			distance = abs(pod_y - node_y)
-			logger.debug('distance: {}'.format(distance))
-			if distance < 20:
-				logger.debug('CONTACT')
-				pod.NODE_AHEAD.POD_CONTACT = True
+	def case_1_check_pod_contact(self, dt):
+		for node in interface.ObjReg.node_registry:
+			for pod in interface.ObjReg.pod_registry:
+				if node.isContact(pod):
+					pod.hasContact()
+
 
 	def case_1_master_clock_ticker(self, dt):
 		self.interface.master_clock.startPulse()
