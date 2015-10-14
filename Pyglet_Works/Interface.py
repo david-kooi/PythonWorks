@@ -9,6 +9,7 @@ from Structures import Node
 import ObjectRegistry
 import logging
 import Config
+import subprocess
 
 ## Subclass window
 class Interface(pyglet.window.Window):
@@ -116,7 +117,7 @@ class Periodic(object):
 				pod.move(dt)
 				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
-				if pod.SPRITE.y >= self.interface.window_height + pod.SPRITE.height/2:
+				if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
 					pod.SPRITE.y = 0
 
 	def case_1_engage_node_state_machine(self, dt):
@@ -135,12 +136,29 @@ class Periodic(object):
 	
 
 if __name__ == "__main__":
+
 	logging.basicConfig(level=logging.DEBUG)
-	logger = logging.getLogger('Pyglet')
+	application_logger = logging.getLogger('Pyglet')
+	time_logger = logging.getLogger('time_logger')
+	position_logger = logging.getLogger('position_logger')
+	
+	time_data = logging.FileHandler(config.time_data)
+	time_data.setLevel(logging.INFO)
+		
+	position_data = logging.FileHandler(config.position_data)
+	position_data.setLevel(logging.INFO)
+
+	logger.addHandler(data_log)
+	logger.addHandler()
 
 
 	## Create Window
 	interface = Interface(w=700, h=700, c="Interface")
+	
+	## Clear Data Files
+	config = Config.Config(interface)
+	subprocess.call('rm {}'.format(config.time_data), shell=True)
+	subprocess.call('rm {}'.format(config.position_data), shell=True)
 
 	## Run app
 	pyglet.app.run()

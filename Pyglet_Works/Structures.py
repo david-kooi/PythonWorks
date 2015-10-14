@@ -125,12 +125,13 @@ class Node(object):
                 self.logger.debug('---- BUFFERING ----')
                 self.logger.debug('pod: {}'.format(pod.ID))
                 self.logger.debug('POD_Y: {}'.format(pod.SPRITE.y))
+                self.logger.debug('NODE_Y: {}'.format(self.SPRITE.y))
                 pod.START_buffer_time()
 
 
     def isContact(self, pod):
         distance = abs(pod.SPRITE.y - self.SPRITE.y)
-        if distance < 1:
+        if distance < 5:
            # self.logger.debug('---- CONTACT ----')
             #self.logger.debug('NODE: {}'.format(self.ID))
             #self.logger.debug('POD: {}'.format(pod.ID))
