@@ -138,25 +138,28 @@ class Periodic(object):
 if __name__ == "__main__":
 
 	logging.basicConfig(level=logging.DEBUG)
-	application_logger = logging.getLogger('Pyglet')
-	time_logger = logging.getLogger('time_logger')
-	position_logger = logging.getLogger('position_logger')
+	logger = logging.getLogger('Pyglet')
 	
+	#time_logger = logging.getLogger('time_logger')
+	#position_logger = logging.getLogger('position_logger')
+
+	#logger.addHandler(time_logger)
+	#logger.addHandler(position_logger)
+
+
+	## Create Window
+	interface = Interface(w=700, h=700, c="Interface")
+
+	## Config
+	config = Config.Config(interface)
+
 	time_data = logging.FileHandler(config.time_data)
 	time_data.setLevel(logging.INFO)
 		
 	position_data = logging.FileHandler(config.position_data)
 	position_data.setLevel(logging.INFO)
-
-	logger.addHandler(data_log)
-	logger.addHandler()
-
-
-	## Create Window
-	interface = Interface(w=700, h=700, c="Interface")
 	
 	## Clear Data Files
-	config = Config.Config(interface)
 	subprocess.call('rm {}'.format(config.time_data), shell=True)
 	subprocess.call('rm {}'.format(config.position_data), shell=True)
 

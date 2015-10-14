@@ -7,7 +7,6 @@ class Config(object):
 
     class __Config(object):
       def __init__(self, Interface=None):
-          logging.basicConfig(level=logging.DEBUG)
           self.logger = logging.getLogger('Config')
 
 
@@ -88,7 +87,7 @@ class Config(object):
   
   
     def __init__(self, Interface=None):
-        print '----Creating Config----'
+        print'----Creating Config----'
         if Config.instance == None:
             print 'Config instance is none'
             #if Interface == None:

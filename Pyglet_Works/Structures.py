@@ -16,7 +16,6 @@ class Clock(pyglet.event.EventDispatcher):
 class Pod(object):
 
     def __init__(self, sprite, default_velocity, ID):
-    	logging.basicConfig(level=logging.DEBUG)
         self.logger = logging.getLogger('POD')
 
         ## Config
