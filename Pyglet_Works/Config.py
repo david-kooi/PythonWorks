@@ -9,10 +9,6 @@ class Config(object):
       def __init__(self, Interface=None):
           self.logger = logging.getLogger('Config')
 
-
-          self.time_data = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/time_data.txt'
-          self.position_data = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/position_data.txt'
-
           self.INTERFACE_HEIGHT = Interface.window_height
           self.INTERFACE_WIDTH = Interface.window_width
 

@@ -17,6 +17,7 @@ class Pod(object):
 
     def __init__(self, sprite, default_velocity, ID):
         self.logger = logging.getLogger('POD')
+        self.position_logger= logging.getLogger('position_logger')
 
         ## Config
         self.config = Config.Config()
@@ -37,11 +38,17 @@ class Pod(object):
         self.timer = 0
 
     def move(self, dt):
+
+        ## Keep Track of the time for debug purposes
         self.timer += dt
         if self.timer > 1:
             self.timer = 0
             self.logger.debug('---- 1 SECOND ----')
             self.logger.debug('Y_POS: {}'.format(self.SPRITE.y))
+            self.logger.debug('POD_VEL: {}'.format(self.velocity))
+        #
+
+        self.position_logger.info('{}'.format(self.SPRITE.y))
         self.SPRITE.y += self.velocity * dt
         #self.label.y  += self.velocity * dt
 

@@ -71,7 +71,7 @@ class Interface(pyglet.window.Window):
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
 		#pyglet.clock.schedule_interval(self.periodics.case_1_engage_node_state_machine, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
 
 
 	def on_activate(self):
@@ -88,7 +88,6 @@ class Interface(pyglet.window.Window):
 	def on_draw(self):
 		self.clear()
 		self.case1_batch.draw()
-
 
 
 ## Class containing periodic function for an Interface
@@ -136,16 +135,37 @@ class Periodic(object):
 	
 
 if __name__ == "__main__":
-
-	logging.basicConfig(level=logging.DEBUG)
-	logger = logging.getLogger('Pyglet')
+	## Establish Data Files
+        data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/data_FILE.txt'
+       # position_data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/position_data.txt'
 	
+	## Clear Data Files
+	subprocess.call('rm {}'.format(data_FILE), shell=True)
+	#subprocess.call('rm {}'.format(position_data_FILE), shell=True)
+
+	## Create Logger Structure
+	logging.basicConfig(level=logging.DEBUG, filename='logdump.log') # Top Level...everything goes into the diump
+	
+	logger = logging.getLogger('Process_Logger') # Log application process
+	
+	##TODO: Mess with format...make look nice
+	#logger.format()
+
+	console_handler = logging.StreamHandler()
+	logger.addHandler(console_handler) ## Handler sends LogEvents to stderr
+	logger.debug('Process_Logger Online')
+	
+	data_logger = logging.getLogger('data_logger')
+	data_handler = logging.FileHandler(data_FILE)
+	data_handler.setLevel(logging.INFO)
+	data_logger.addHandler(data_handler)
+	data_logger.info('Data_Logger Online')
+
 	#time_logger = logging.getLogger('time_logger')
 	#position_logger = logging.getLogger('position_logger')
 
 	#logger.addHandler(time_logger)
 	#logger.addHandler(position_logger)
-
 
 	## Create Window
 	interface = Interface(w=700, h=700, c="Interface")
@@ -153,15 +173,9 @@ if __name__ == "__main__":
 	## Config
 	config = Config.Config(interface)
 
-	time_data = logging.FileHandler(config.time_data)
-	time_data.setLevel(logging.INFO)
-		
-	position_data = logging.FileHandler(config.position_data)
-	position_data.setLevel(logging.INFO)
+	#position_data = logging.FileHandler(config.position_data)
+	#position_data.setLevel(logging.INFO)
 	
-	## Clear Data Files
-	subprocess.call('rm {}'.format(config.time_data), shell=True)
-	subprocess.call('rm {}'.format(config.position_data), shell=True)
 
 	## Run app
 	pyglet.app.run()
