@@ -9,6 +9,11 @@ class Config(object):
       def __init__(self, Interface=None):
           self.logger = logging.getLogger('Config')
 
+
+          ## Auto Adjust
+          self.AutoAdjust_ENABLED = True
+
+          ## Interface Things
           self.INTERFACE_HEIGHT = Interface.window_height
           self.INTERFACE_WIDTH = Interface.window_width
 

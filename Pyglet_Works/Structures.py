@@ -16,16 +16,15 @@ class Clock(pyglet.event.EventDispatcher):
 class Pod(object):
 
     def __init__(self, sprite, default_velocity, ID):
-        self.logger = logging.getLogger('POD')
-        self.position_logger= logging.getLogger('position_logger')
+        self.logger = logging.getLogger('process_logger.POD')
+        self.data_logger= logging.getLogger('data_logger')
 
         ## Config
         self.config = Config.Config()
+        self.logger.debug('autoADJ: {}'.format(self.config.AutoAdjust_ENABLED))
 
-        ## Sprite and Coordinates
+        ## Sprite contains the coordinates
         self.SPRITE = sprite 
-        self.Y_POS = self.SPRITE.y
-        self.X_POS = self.SPRITE.x
 
         self.ID = ID
        	self.velocity = default_velocity 
@@ -37,53 +36,61 @@ class Pod(object):
 
         self.timer = 0
 
+    def monitor_timer(self, dt):
+        self.timer += dt
+
+        if self.timer > 1: ## Trigger at 1 second
+            self.logger.debug('---- 1 SECOND ----')
+
+            self.logger.debug('Y_POS: {}'.format(self.SPRITE.y))
+            self.logger.debug('POD_VEL: {}'.format(self.velocity))
+
+            self.timer = 0
+            
+        
+
+    ## 60 Hz
     def move(self, dt):
 
         ## Keep Track of the time for debug purposes
-        self.timer += dt
-        if self.timer > 1:
-            self.timer = 0
-            self.logger.debug('---- 1 SECOND ----')
-            self.logger.debug('Y_POS: {}'.format(self.SPRITE.y))
-            self.logger.debug('POD_VEL: {}'.format(self.velocity))
-        #
+        #self.monitor_timer(dt)
 
-        self.position_logger.info('{}'.format(self.SPRITE.y))
+        #self.position_logger.info('{}'.format(self.SPRITE.y))
         self.SPRITE.y += self.velocity * dt
         #self.label.y  += self.velocity * dt
 
-
+    ## Starts when in range of node PULSE
     def START_buffer_time(self):
         self.buffer_time_START = time.time()
         self.BUFFERING = True
 
-        #self.debug('---- BUFFER STARTED ----')
+
     def hasContact(self):
         if self.BUFFERING:
-            self.logger.debug('BUFFER CONTACT')
-            self.logger.debug('POD: {}'.format(self.ID))
-            self.logger.debug('POD Y: {}'.format(self.SPRITE.y))
-
+            self.logger.debug('---- BUFFER CONTACT ----')
             self.buffer_time_END = time.time()
             total_buffer_time = self.buffer_time_END - self.buffer_time_START
-            self.logger.debug('buffer_time: {}'.format(total_buffer_time))
+            self.logger.debug('buffer_time: {}'.format(total_buffer_time))    
+
+            if total_buffer_time > 1:
+                total_buffer_time = 0        
 
             ## Adjust vel
-            spacing = self.config.CASE_1_NODE_SPACING
-            time_distance = self.config.NODE_TIME_DISTANCE
-            self.velocity =  spacing / (time_distance - total_buffer_time)
-            self.logger.debug('mod velocity: {}'.format(self.velocity))
+            self.adjustVelocity(total_buffer_time)
 
+            self.data_logger.info('V_{}'.format(self.velocity))
+            self.data_logger.info('B_{}'.format(total_buffer_time))
 
             self.BUFFERING = False
-
-    def setYPos(self,y):
-    	self.SPRITE.y = y
-
-    def setXPos(self, x):
-    	self.SPRITE.x = x
-
     
+    def adjustVelocity(self, buffer_time):
+        if self.config.AutoAdjust_ENABLED:
+            self.logger.debug('Adjusting Velocity')
+            spacing = self.config.CASE_1_NODE_SPACING
+            time_distance = self.config.NODE_TIME_DISTANCE
+            self.velocity =  spacing / (time_distance - buffer_time)
+
+
     def resetAutoAdjust(self):
         ## AutoAdjust Variables
         self.buffer_time_START = 0
@@ -92,7 +99,9 @@ class Pod(object):
 class Node(object):
     def __init__(self, pod_registry, sprite, clock, ID):
         logging.basicConfig(level=logging.DEBUG)
-        self.logger = logging.getLogger('NODE')
+        self.logger = logging.getLogger('process_logger.NODE')
+        self.data_logger = logging.getLogger('data_logger')
+
 
         ## Get Object Registry
         self.pod_registry = pod_registry
@@ -113,12 +122,10 @@ class Node(object):
         self.ID = ID
         self.SPRITE = sprite 
         self.POD_IN_CONTACT = None
+        self.BUFFERING = False
 
     def pulse(self):
-        self.logger.debug('NODE {} PULSE'.format(self.ID))
-
         self.checkPulseContact()
-
             
     def checkPulseContact(self):
         for pod in self.pod_registry:
@@ -126,70 +133,24 @@ class Node(object):
             if self.isContact(pod):
                 self.logger.debug('---- PULSE CONTACT ----')
                 pod.velocity = self.config.POD_VEL
-                self.logger.debug('pod velocity: {}'.format(pod.velocity))
+                self.POD_IN_CONTACT = pod
+
+                self.data_logger.info('V_{}'.format(pod.velocity))
+                self.data_logger.info('B_0')
+
+
             else:
-                self.logger.debug('---- BUFFERING ----')
-                self.logger.debug('pod: {}'.format(pod.ID))
-                self.logger.debug('POD_Y: {}'.format(pod.SPRITE.y))
-                self.logger.debug('NODE_Y: {}'.format(self.SPRITE.y))
+                self.logger.debug('--------------- BUFFERING ----------------')
+               # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
                 pod.START_buffer_time()
 
+        ## TODO: Add case for when there is no pod in near distance
 
     def isContact(self, pod):
         distance = abs(pod.SPRITE.y - self.SPRITE.y)
         if distance < 5:
-           # self.logger.debug('---- CONTACT ----')
-            #self.logger.debug('NODE: {}'.format(self.ID))
-            #self.logger.debug('POD: {}'.format(pod.ID))
             return True
+
         return False
-
-
-    def engageStateMachine(self):
-        self.logger.debug('engageStateMachine')
-        self.logger.debug('IS_ACTIVE: {}'.format(self.IS_ACTIVE))
-
-        if self.IS_ACTIVE:
-            loop_start = time.time()
-            while True:
-                if self.CLOCK_PULSED:
-                    self.logger.debug('Time Buffer START')
-                    To = time.time() # T naught
-
-                    while True:
-                        if self.POD_CONTACT:
-                            self.logger.debug('Time Buffer STOP')
-                            ## Timer stop 
-                            Tf = time.time() # T final
-                            self.buffer_time = Tf - To
-                            break
-                    break
-                
-
-                ## Timeout condition
-                loop_end = time.time()
-                elapsed_loop_time = loop_end - loop_start
-                if elapsed_loop_time > 5:
-                    self.logger.error('STATE MACHINE TIMEOUT')
-                    break
-
-            mod_velocity = self.config.CASE_1_NODE_SPACING / (self.config.NODE_TIME_DISTANCE + self.buffer_time)
-            self.next_pod.velocity = mod_velocity
-
-        self.resetStateVariables()
-
-
-    def resetStateVariables(self):
-        ## State Variables
-        self.IS_ACTIVE = False
-        self.START_BUFFER = True
-        self.CLOCK_PULSED = False # 
-        self.POD_CONTACT = False
-
-        ## Reset Pod-Node Relationship
-        self.unregisterPod()
-        ## Time Buffers
-        self.buffer_time = 0
-
 
 

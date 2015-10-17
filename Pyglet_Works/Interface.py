@@ -26,7 +26,7 @@ class Interface(pyglet.window.Window):
 		logger.debug('window_width: {}'.format(w))
 		logger.debug('window_height: {}'.format(h))
 
-		pyglet.window.Window.__init__(self, width=w, height=h, caption=c)    
+		pyglet.window.Window.__init__(self, width=w, height=h, caption=c)    		
 
 		## Clock Instance
 		self.master_clock = Clock()
@@ -54,25 +54,22 @@ class Interface(pyglet.window.Window):
 		self.configuration = Config.Config(Interface=self)
 		self.ObjReg = ObjectRegistry.ObjectRegistry(self)
 
-		## Register case triggers
-		self.periodics = Periodic(self)
-		self.case_triggers = dict()
-#		self.case_triggers[Interface.CASE_1] = self.periodics.case_1
-#		self.case_triggers[Interface.CASE_2] = self.periodics.case_2
+		## Set AutoAdjust
+		#self.configuration.AutoAdjust_ENABLED = True
+		#logger.debug('AutoAdjust_ENABLED: {}'.format(self.configuration.AutoAdjust_ENABLED))
 
 		## Create a way to access the groups
 		self.batch_dict = dict()
 		self.batch_dict['background_group'] = self.background_group
 		self.batch_dict['foreground_group'] = self.foreground_group
 
+
+		## Initalize Periodic functions
+		self.periodics = Periodic(self)
 		## Start Periodic Functions
-		#pyglet.clock.schedule_interval(self.case_triggers[self.current_case], 1)
-		#pyglet.clock.schedule_once(self.periodics.case_1_node_pod_link, 0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
-		#pyglet.clock.schedule_interval(self.periodics.case_1_engage_node_state_machine, 1/60.0)
-		#pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
-
 
 	def on_activate(self):
 		logger.debug('----on_activate----')
@@ -96,6 +93,9 @@ class Periodic(object):
 		self.interface = interface
 		self.config = Config.Config()
 
+		self.log_position_SET = False
+		self.timer = 0
+
 	def case_1_node_pod_link(self, dt):
 		logger.debug('----node pod link----')
 		for idx,pod in enumerate(self.interface.ObjReg.pod_registry):
@@ -104,15 +104,16 @@ class Periodic(object):
 
 	def case_1_pod_motion(self, dt):
 		#logger.debug("periodic: dt: {}".format(dt))
-		pod_velocity = self.config.POD_VEL
+
+		if not self.log_position_SET:
+			self.timer += dt
+			if self.timer >= 0.5:
+				logger.debug('---- POSITION CHECKER ENABLED ----')
+				pyglet.clock.schedule_interval(self.case_1_position_checker, self.config.PULSE_WIDTH)
+				self.log_position_SET = True
+
 
 		for pod in interface.ObjReg.pod_registry:
-
-				#logger.debug('pod: {}'.format(pod.ID))
-				#logger.debug('next node: {}'.format(pod.NODE_AHEAD.ID))
-			     #   logger.debug('old pos: {}'.format(pod.SPRITE.y))
-				#newPosition = pod.Y_POS + (pod_velocity * dt)
-				#logger.debug('new pos: {}'.format(newPosition))
 				pod.move(dt)
 				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
@@ -129,18 +130,27 @@ class Periodic(object):
 				if node.isContact(pod):
 					pod.hasContact()
 
+	## Get the position every 1/2 of a second.
+	def case_1_position_checker(self, dt):
+		for pod in interface.ObjReg.pod_registry:
+			data_logger.info('P_{}'.format(pod.SPRITE.y))
 
 	def case_1_master_clock_ticker(self, dt):
+		## Itereate through nodes and get pods within range		
+
 		self.interface.master_clock.startPulse()
 	
 
 if __name__ == "__main__":
 	## Establish Data Files
         data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/data_FILE.txt'
+        log_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/logdump.log'
        # position_data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/position_data.txt'
 	
 	## Clear Data Files
 	subprocess.call('rm {}'.format(data_FILE), shell=True)
+	subprocess.call('rm {}'.format(log_FILE), shell=True)
+
 	#subprocess.call('rm {}'.format(position_data_FILE), shell=True)
 
 	## Create Logger Structure
@@ -159,7 +169,7 @@ if __name__ == "__main__":
 	data_handler = logging.FileHandler(data_FILE)
 	data_handler.setLevel(logging.INFO)
 	data_logger.addHandler(data_handler)
-	data_logger.info('Data_Logger Online')
+	data_logger.addHandler(console_handler)
 
 	#time_logger = logging.getLogger('time_logger')
 	#position_logger = logging.getLogger('position_logger')
