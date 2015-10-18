@@ -70,6 +70,7 @@ class Interface(pyglet.window.Window):
 		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.case_1_pod_position, 1/60.0)
 
 	def on_activate(self):
 		logger.debug('----on_activate----')
@@ -126,13 +127,17 @@ class Periodic(object):
 		for node in interface.ObjReg.node_registry:
 			for pod in interface.ObjReg.pod_registry:
 				if node.isContact(pod):
-					pod.hasContact()
+					pod.hasContact(node)
 
 	## Get the position every 1/2 of a second.
 	def case_1_position_checker(self, dt):
 		for pod in interface.ObjReg.pod_registry:
 			data_logger.info('P_{}'.format(pod.SPRITE.y))
 
+
+	def case_1_pod_position(self, dt):
+		for pod in interface.ObjReg.pod_registry:
+			logger.debug('POD {} | POSITION {}'.format(pod.ID, pod.SPRITE.y))
 	def case_1_master_clock_ticker(self, dt):
 		## Itereate through nodes and get pods within range		
 		self.interface.master_clock.startPulse()

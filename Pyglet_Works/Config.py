@@ -40,8 +40,10 @@ class Config(object):
           self.NODE_RADIUS = 15
           self.NODE_COLOR = (203, 26, 10, 255)
           self.CASE_1_NODE_START = 50
-          self.CASE_1_numNodes = 1
+          self.CASE_1_numNodes = 2
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
+          self.NODE_SPRITE_SCALE = .45
+          self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 2
 
 
           ## Pod Attributes

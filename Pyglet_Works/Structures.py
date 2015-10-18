@@ -50,9 +50,9 @@ class Pod(object):
         self.BUFFERING = True
 
 
-    def hasContact(self):
+    def hasContact(self, node):
         if self.BUFFERING:
-            self.logger.debug('---- BUFFER CONTACT ----')
+            self.logger.debug('---- NODE {} BUFFER CONTACT POD {} ----'.format(node.ID, self.ID))
             self.buffer_time_END = time.time()
             total_buffer_time = self.buffer_time_END - self.buffer_time_START
             self.logger.debug('buffer_time: {}'.format(total_buffer_time))    
@@ -97,8 +97,6 @@ class Node(object):
         ## Get Config
         self.config = Config.Config()
         
-        ## State Variables
-        self.POD_CONTACT = False
 
         ## Time Buffers
         self.buffer_time = 0
@@ -106,17 +104,43 @@ class Node(object):
         ## Other
         self.ID = ID
         self.SPRITE = sprite 
+        self.UPPER_DETECTION_RADIUS = self.getDetectionRadius()['upper']
+        self.LOWER_DETECTION_RADIUS = self.getDetectionRadius()['lower']
+
+        ## State Variables
         self.POD_IN_CONTACT = None
         self.BUFFERING = False
 
+
+    def getDetectionRadius(self):
+        l = self.SPRITE.y - self.config.GENERAL_DETECTION_RADIUS
+        ## Lower Detection radius of bottom node is translated to the top of the screen
+        if l <= 0:
+            l = self.config.INTERFACE_HEIGHT - self.config.GENERAL_DETECTION_RADIUS
+        
+        u = self.SPRITE.y
+
+        ## If lower radius is greater than upper limit then make upper limit top of screen
+        if l > u:
+            u = self.config.INTERFACE_HEIGHT
+
+        ## Wrap return values
+        d = dict()
+        d['lower'] = l
+        d['upper'] = u
+        
+        return d
+
     def pulse(self):
+        self.logger.debug('NODE {} PULSE'.format(self.ID))
+
         self.checkPulseContact()
             
     def checkPulseContact(self):
         for pod in self.pod_registry:
             
             if self.isContact(pod):
-                self.logger.debug('---- PULSE CONTACT ----')
+                self.logger.debug('---- NODE {} PULSE CONTACT POD {} ----'.format(self.ID, pod.ID))
                 pod.velocity = self.config.POD_VEL
                 self.POD_IN_CONTACT = pod
 
@@ -125,9 +149,11 @@ class Node(object):
 
 
             else:
-                self.logger.debug('--------------- BUFFERING ----------------')
-               # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
-                pod.START_buffer_time()
+                ## Check if pod is in valid buffer zone
+                if (pod.SPRITE.y >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.y < self.UPPER_DETECTION_RADIUS):  
+                    self.logger.debug('------- NODE {} BUFFERING POD {} --------'.format(self.ID, pod.ID))
+                   # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
+                    pod.START_buffer_time()
 
         ## TODO: Add case for when there is no pod in near distance
 

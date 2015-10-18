@@ -31,9 +31,9 @@ class ObjectRegistry(object):
 
             ## Nodes
             start_pos = self.config.CASE_1_NODE_SPACING #+ self.config.CASE_1_NODE_START
-            #self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
-            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
-            #self.createNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=2)
+            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
+            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
+            self.createEndNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP) ## 
 
             ## Pods
             #self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
@@ -61,6 +61,27 @@ class ObjectRegistry(object):
             for pod in self.pod_registry:
                 pod.label = label
 
+        def createEndNode(self, x, y, case_batch, case_group):
+              sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
+              sprite.scale = self.config.NODE_SPRITE_SCALE
+              self.general_registry.append(sprite)
+        def createNode(self, x, y, case_batch, case_group, ID):
+              sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
+              sprite.scale = self.config.NODE_SPRITE_SCALE
+  
+              node = Node(self.pod_registry, sprite, self.interface.master_clock, ID=ID)
+              self.node_registry.append(node)
+  
+              self.logger.debug('----node created----')
+              self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))
+              return node
+  
+  
+        def getNodeByID(self, ID):
+              for node in self.node_registry:
+                    if node.ID == ID:
+                          return node 
+  
 	def createPod(self, x, y, case_batch, case_group):
             ## Create Pod
             sprite = pyglet.sprite.Sprite(self.config.POD_IMAGE, x, y, batch=case_batch, group=case_group)
@@ -97,14 +118,5 @@ class ObjectRegistry(object):
 
             self.logger.debug('----track created----')
             self.logger.debug('track x: {} | track y: {}'.format(track.x, track.y))
-        def createNode(self, x, y, case_batch, case_group, ID):
-            sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
-            sprite.scale = .45
-
-            node = Node(self.pod_registry, sprite, self.interface.master_clock, ID=ID)
-            self.node_registry.append(node)
-
-            self.logger.debug('----node created----')
-            self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))
-            return node
+        
 
