@@ -7,10 +7,13 @@ class Config(object):
 
     class __Config(object):
       def __init__(self, Interface=None):
-          logging.basicConfig(level=logging.DEBUG)
           self.logger = logging.getLogger('Config')
 
 
+          ## Auto Adjust
+          self.AutoAdjust_ENABLED = False
+
+          ## Interface Things
           self.INTERFACE_HEIGHT = Interface.window_height
           self.INTERFACE_WIDTH = Interface.window_width
 
@@ -43,8 +46,8 @@ class Config(object):
 
           ## Pod Attributes
           self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
-          self.POD_IMAGE.anchor_x = self.POD_IMAGE.width // 2 ## Set anchor point to middle of image
-          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height // 2 
+          self.POD_IMAGE.anchor_x = self.POD_IMAGE.width / 2 ## Set anchor point to middle of image
+          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height / 2 
 
           self.POD_RADIUS = 30
           self.POD_COLOR = (255, 255, 255, 255)
@@ -53,13 +56,13 @@ class Config(object):
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
-          self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width // 2 ## Set anchor point to middle of image
-          self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height // 2    
+          self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width / 2 ## Set anchor point to middle of image
+          self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height / 2    
 
           ## Node Attributes
           self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
-          self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width // 2
-          self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height // 2
+          self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width / 2
+          self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height / 2
   
           ## Interface Attributes
           self.X_ZERO = Interface.X_ZERO
@@ -85,7 +88,7 @@ class Config(object):
   
   
     def __init__(self, Interface=None):
-        print '----Creating Config----'
+        print'----Creating Config----'
         if Config.instance == None:
             print 'Config instance is none'
             #if Interface == None:

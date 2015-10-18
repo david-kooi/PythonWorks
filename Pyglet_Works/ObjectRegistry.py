@@ -10,7 +10,6 @@ from pyglet.text import Label
 class ObjectRegistry(object):
 
 	def __init__(self, Interface):
-            logging.basicConfig(level=logging.DEBUG)
             self.logger = logging.getLogger('ObjectRegistry')
             self.logger.debug('ObjectRegistry')
             self.logger.debug('__init__')
