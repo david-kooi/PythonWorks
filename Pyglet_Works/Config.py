@@ -11,7 +11,7 @@ class Config(object):
 
 
           ## Auto Adjust
-          self.AutoAdjust_ENABLED = True
+          self.AutoAdjust_ENABLED = False
 
           ## Interface Things
           self.INTERFACE_HEIGHT = Interface.window_height

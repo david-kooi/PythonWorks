@@ -105,6 +105,7 @@ class Periodic(object):
 	def case_1_pod_motion(self, dt):
 		#logger.debug("periodic: dt: {}".format(dt))
 
+		## Start position checker after 1/2 seconds
 		if not self.log_position_SET:
 			self.timer += dt
 			if self.timer >= 0.5:
