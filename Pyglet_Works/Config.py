@@ -19,10 +19,12 @@ class Config(object):
 
           ## Batches
           self.CASE_1_BATCH = Interface.case1_batch
+          self.GENERAL_BATCH = Interface.general_batch
 
           #Groups
-          self.CASE_1_F_GROUP = Interface.foreground_group
-          self.CASE_1_B_GROUP = Interface.background_group
+          self.GROUP_A = Interface.group_a
+          self.GROUP_B = Interface.group_b
+          self.GROUP_C = Interface.group_c
 
           ## COLORS
           self.IF_BG_COLOR = (176, 163, 156, 255) ## Interface Background 
@@ -40,7 +42,7 @@ class Config(object):
           self.NODE_RADIUS = 15
           self.NODE_COLOR = (203, 26, 10, 255)
           self.CASE_1_NODE_START = 50
-          self.CASE_1_numNodes = 2
+          self.CASE_1_numNodes = 3
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
           self.NODE_SPRITE_SCALE = .45
           self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 2
@@ -65,6 +67,11 @@ class Config(object):
           self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
           self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width / 2
           self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height / 2
+
+          ## Background
+          self.BG_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/bg.png')
+          self.BG_IMAGE.anchor_y = 0
+          self.BG_IMAGE.anchor_x = 0
   
           ## Interface Attributes
           self.X_ZERO = Interface.X_ZERO

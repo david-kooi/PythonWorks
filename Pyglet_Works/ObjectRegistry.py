@@ -29,17 +29,27 @@ class ObjectRegistry(object):
             self.objects = dict()
             self.objects['case_1'] = dict()
 
+            ## Create Background
+            self.createBackground(self.config.GENERAL_BATCH, self.config.GROUP_A)
+
+            ## Track
+            self.createTrack(self.config.X_ZERO, self.config.Y_ZERO, self.config.CASE_1_BATCH, self.config.GROUP_A)
+
             ## Nodes
             start_pos = self.config.CASE_1_NODE_SPACING #+ self.config.CASE_1_NODE_START
-            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=0)
-            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP, ID=1)
-            self.createEndNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP) ## 
+            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=0)
+            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=1)
+            self.createNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=2)
+            self.createEndNode(self.config.X_ZERO, 3 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B) ## 
+
+            ## Node Detection Fields
+
 
             ## Pods
-            #self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            #self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.CASE_1_F_GROUP)
-            #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.CASE_1_F_GROUP)
+            #self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
+            self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
+            #self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
+            #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.GROUP_C)
 
 
             ## Labels
@@ -49,8 +59,10 @@ class ObjectRegistry(object):
             #self.linkPods()
 
 
-            ## Track
-            self.createTrack(self.config.X_ZERO, self.config.Y_ZERO, self.config.CASE_1_BATCH, self.config.CASE_1_B_GROUP)
+        def createBackground(self, case_batch, case_group):
+            ## Set Background at 0,0 default coordinates
+            sprite = pyglet.sprite.Sprite(self.config.BG_IMAGE, 0, 0, batch=case_batch, group=case_group)
+            self.general_registry.append(sprite)
 
 
         def createLabel(self, pod, case_batch, case_group):
@@ -63,11 +75,11 @@ class ObjectRegistry(object):
 
         def createEndNode(self, x, y, case_batch, case_group):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
-              sprite.scale = self.config.NODE_SPRITE_SCALE
+              sprite.scale = .5
               self.general_registry.append(sprite)
         def createNode(self, x, y, case_batch, case_group, ID):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
-              sprite.scale = self.config.NODE_SPRITE_SCALE
+              sprite.scale = .5
   
               node = Node(self.pod_registry, sprite, self.interface.master_clock, ID=ID)
               self.node_registry.append(node)
@@ -75,7 +87,17 @@ class ObjectRegistry(object):
               self.logger.debug('----node created----')
               self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))
               return node
+      
+        def createDetectionField(node):
+              ## Set anchor to center top
   
+              height = self.config.GENERAL_DETECTION_RADIUS
+              width = self.config.TRACK_WIDTH
+              x_pos = self.config.X_ZERO
+              y_pos = node.SPRITE.y
+  
+
+              #self.general_registry.append()
   
         def getNodeByID(self, ID):
               for node in self.node_registry:
@@ -85,7 +107,7 @@ class ObjectRegistry(object):
 	def createPod(self, x, y, case_batch, case_group):
             ## Create Pod
             sprite = pyglet.sprite.Sprite(self.config.POD_IMAGE, x, y, batch=case_batch, group=case_group)
-            sprite.scale = .2
+            sprite.scale = .5
 
             ## Attach to registry
             list_index = len(self.pod_registry)

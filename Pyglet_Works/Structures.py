@@ -104,8 +104,9 @@ class Node(object):
         ## Other
         self.ID = ID
         self.SPRITE = sprite 
-        self.UPPER_DETECTION_RADIUS = self.getDetectionRadius()['upper']
-        self.LOWER_DETECTION_RADIUS = self.getDetectionRadius()['lower']
+        limits = self.getDetectionRadius()
+        self.UPPER_DETECTION_RADIUS = limits['upper']
+        self.LOWER_DETECTION_RADIUS = limits['lower']
 
         ## State Variables
         self.POD_IN_CONTACT = None
@@ -128,6 +129,9 @@ class Node(object):
         d = dict()
         d['lower'] = l
         d['upper'] = u
+
+        self.logger.debug('---- NODE {} DETECTION LIMITS ----'.format(self.ID))
+        self.logger.debug('UPPER {} | LOWER {}'.format(u, l))
         
         return d
 

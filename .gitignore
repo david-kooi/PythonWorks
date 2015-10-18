@@ -2,4 +2,5 @@
 *.txt
 *.log
 *.png
-
+*.svg
+PygletWorks/res/*

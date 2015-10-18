@@ -43,8 +43,10 @@ class Interface(pyglet.window.Window):
 		self.Y_ZERO = h/2
 
 		## Create Batches and Groups
-		self.background_group = pyglet.graphics.OrderedGroup(0)
-		self.foreground_group = pyglet.graphics.OrderedGroup(1)
+		self.group_a = pyglet.graphics.OrderedGroup(0)
+		self.group_b = pyglet.graphics.OrderedGroup(1)
+		self.group_c = pyglet.graphics.OrderedGroup(2)
+
 		self.general_batch = pyglet.graphics.Batch()
 		self.case1_batch = pyglet.graphics.Batch()
 		self.general_labels = []
@@ -57,12 +59,6 @@ class Interface(pyglet.window.Window):
 		## Set AutoAdjust
 		#self.configuration.AutoAdjust_ENABLED = True
 		#logger.debug('AutoAdjust_ENABLED: {}'.format(self.configuration.AutoAdjust_ENABLED))
-
-		## Create a way to access the groups
-		self.batch_dict = dict()
-		self.batch_dict['background_group'] = self.background_group
-		self.batch_dict['foreground_group'] = self.foreground_group
-
 
 		## Initalize Periodic functions
 		self.periodics = Periodic(self)
@@ -81,10 +77,12 @@ class Interface(pyglet.window.Window):
 	#		pod.SPRITE.delete()
 
 	def on_mouse_press(self, x, y, button, modifiers):
-		print "mouse pressed"
+		for pod in self.ObjReg.pod_registry:
+			pod.SPRITE.y = y
 
 	def on_draw(self):
 		self.clear()
+		self.general_batch.draw()
 		self.case1_batch.draw()
 
 
@@ -171,7 +169,7 @@ if __name__ == "__main__":
 	data_logger.addHandler(console_handler)
 
 	## Create Window
-	interface = Interface(w=700, h=700, c="Interface")
+	interface = Interface(w=700, h=850, c="Interface")
 
 	## Config
 	config = Config.Config(interface)
