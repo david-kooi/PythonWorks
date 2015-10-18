@@ -93,6 +93,7 @@ class Periodic(object):
 		self.interface = interface
 		self.config = Config.Config()
 
+		## To stager clocks
 		self.log_position_SET = False
 		self.timer = 0
 
@@ -121,10 +122,6 @@ class Periodic(object):
 				if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
 					pod.SPRITE.y = 0
 
-	def case_1_engage_node_state_machine(self, dt):
-		for node in interface.ObjReg.node_registry:
-			node.engageStateMachine()
-
 	def case_1_check_pod_contact(self, dt):
 		for node in interface.ObjReg.node_registry:
 			for pod in interface.ObjReg.pod_registry:
@@ -138,7 +135,6 @@ class Periodic(object):
 
 	def case_1_master_clock_ticker(self, dt):
 		## Itereate through nodes and get pods within range		
-
 		self.interface.master_clock.startPulse()
 	
 
@@ -146,13 +142,10 @@ if __name__ == "__main__":
 	## Establish Data Files
         data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/data_FILE.txt'
         log_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/logdump.log'
-       # position_data_FILE = '/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/position_data.txt'
 	
 	## Clear Data Files
 	subprocess.call('rm {}'.format(data_FILE), shell=True)
 	subprocess.call('rm {}'.format(log_FILE), shell=True)
-
-	#subprocess.call('rm {}'.format(position_data_FILE), shell=True)
 
 	## Create Logger Structure
 	logging.basicConfig(level=logging.DEBUG, filename='logdump.log') # Top Level...everything goes into the diump
@@ -172,21 +165,11 @@ if __name__ == "__main__":
 	data_logger.addHandler(data_handler)
 	data_logger.addHandler(console_handler)
 
-	#time_logger = logging.getLogger('time_logger')
-	#position_logger = logging.getLogger('position_logger')
-
-	#logger.addHandler(time_logger)
-	#logger.addHandler(position_logger)
-
 	## Create Window
 	interface = Interface(w=700, h=700, c="Interface")
 
 	## Config
 	config = Config.Config(interface)
-
-	#position_data = logging.FileHandler(config.position_data)
-	#position_data.setLevel(logging.INFO)
-	
 
 	## Run app
 	pyglet.app.run()

@@ -36,24 +36,9 @@ class Pod(object):
 
         self.timer = 0
 
-    def monitor_timer(self, dt):
-        self.timer += dt
-
-        if self.timer > 1: ## Trigger at 1 second
-            self.logger.debug('---- 1 SECOND ----')
-
-            self.logger.debug('Y_POS: {}'.format(self.SPRITE.y))
-            self.logger.debug('POD_VEL: {}'.format(self.velocity))
-
-            self.timer = 0
-            
-        
 
     ## 60 Hz
     def move(self, dt):
-
-        ## Keep Track of the time for debug purposes
-        #self.monitor_timer(dt)
 
         #self.position_logger.info('{}'.format(self.SPRITE.y))
         self.SPRITE.y += self.velocity * dt
