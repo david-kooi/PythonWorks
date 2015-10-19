@@ -48,8 +48,8 @@ class ObjectRegistry(object):
             self.addDetectionFields()
 
             ## Pods
-            #self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
-            self.createPod(self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
+            self.createPod(self.config.POD_IMAGE_1, self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
+            self.createPod(self.config.POD_IMAGE_2, self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
             #self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
             #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.GROUP_C)
 
@@ -110,9 +110,9 @@ class ObjectRegistry(object):
                     if node.ID == ID:
                           return node 
   
-	def createPod(self, x, y, case_batch, case_group):
+	def createPod(self, pod_image, x, y, case_batch, case_group):
             ## Create Pod
-            sprite = pyglet.sprite.Sprite(self.config.POD_IMAGE, x, y, batch=case_batch, group=case_group)
+            sprite = pyglet.sprite.Sprite(pod_image, x, y, batch=case_batch, group=case_group)
             sprite.scale = .5
 
             ## Attach to registry

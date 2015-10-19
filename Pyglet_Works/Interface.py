@@ -94,6 +94,7 @@ class Interface(pyglet.window.Window):
 	def on_mouse_press(self, x, y, button, modifiers):
 		for pod in self.ObjReg.pod_registry:
 			pod.SPRITE.y = y
+			break
 
 	def on_draw(self):
 		self.clear()

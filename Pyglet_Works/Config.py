@@ -6,6 +6,11 @@ class Config(object):
     instance = None
 
     class __Config(object):
+
+      def configurePodImages(self):
+          for POD_IMAGE in self.pod_images:
+              POD_IMAGE.anchor_x = POD_IMAGE.width / 2 ## Set anchor point to middle of image
+              POD_IMAGE.anchor_y = POD_IMAGE.height
       def __init__(self, Interface=None):
           self.logger = logging.getLogger('Config')
 
@@ -33,7 +38,7 @@ class Config(object):
           self.BLACK = (0,0,0,0)
 
           ## Case1 Attributes
-          self.CASE_1_numPods = 1
+          self.CASE_1_numPods = 2
           self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
           self.PULSE_WIDTH = 1
           self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 1 # Distance in time
@@ -49,9 +54,15 @@ class Config(object):
 
 
           ## Pod Attributes
-          self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
-          self.POD_IMAGE.anchor_x = self.POD_IMAGE.width / 2 ## Set anchor point to middle of image
-          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height
+          self.pod_images = []
+          self.POD_IMAGE_1 = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod_1.png')
+          self.pod_images.append(self.POD_IMAGE_1)
+
+          self.POD_IMAGE_2 = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod_2.png')
+          self.pod_images.append(self.POD_IMAGE_2)
+
+          ## Configure Pod Images
+          self.configurePodImages()
 
           self.POD_RADIUS = 30
           self.POD_COLOR = (255, 255, 255, 255)
