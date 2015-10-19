@@ -11,7 +11,7 @@ class Config(object):
 
 
           ## Auto Adjust
-          self.AutoAdjust_ENABLED = False
+          self.AutoAdjust_ENABLED = True
 
           ## Interface Things
           self.INTERFACE_HEIGHT = Interface.window_height
@@ -44,19 +44,23 @@ class Config(object):
           self.CASE_1_NODE_START = 50
           self.CASE_1_numNodes = 3
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
-          self.NODE_SPRITE_SCALE = .45
-          self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 2
+          self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 1
+          print 'GENERAL DETECTION RADIUS: {}'.format(self.GENERAL_DETECTION_RADIUS)
 
 
           ## Pod Attributes
           self.POD_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod.png')
           self.POD_IMAGE.anchor_x = self.POD_IMAGE.width / 2 ## Set anchor point to middle of image
-          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height / 2 
+          self.POD_IMAGE.anchor_y = self.POD_IMAGE.height
 
           self.POD_RADIUS = 30
           self.POD_COLOR = (255, 255, 255, 255)
           self.POD_VEL = self.CASE_1_NODE_SPACING/(self.NODE_TIME_DISTANCE) # r = d/t where t = 1s
-          self.logger.debug('POD_VEL: {}'.format(self.POD_VEL))
+          self.MAX_POD_VEL = self.POD_VEL + 1000
+
+          self.logger.debug('DEFAULT POD VELOCITY: {}'.format(self.POD_VEL))
+          self.logger.debug('MAX POD VELOCITY: {}'.format(self.MAX_POD_VEL))
+
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
@@ -72,6 +76,11 @@ class Config(object):
           self.BG_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/bg.png')
           self.BG_IMAGE.anchor_y = 0
           self.BG_IMAGE.anchor_x = 0
+
+          ## Detector Field
+          self.DETECT_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/d_field.png')
+          self.DETECT_IMAGE.anchor_x = self.DETECT_IMAGE.width / 2
+          self.DETECT_IMAGE.anchor_y = self.DETECT_IMAGE.height
   
           ## Interface Attributes
           self.X_ZERO = Interface.X_ZERO

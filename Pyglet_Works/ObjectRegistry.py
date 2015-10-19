@@ -23,6 +23,8 @@ class ObjectRegistry(object):
             ## Object Registers
             self.pod_registry = []
             self.node_registry = []
+            self.EndNode = None
+            self.d_field_registry = []
             self.general_registry = []
 
             ## Object Dictionary
@@ -43,7 +45,7 @@ class ObjectRegistry(object):
             self.createEndNode(self.config.X_ZERO, 3 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B) ## 
 
             ## Node Detection Fields
-
+            self.addDetectionFields()
 
             ## Pods
             #self.createPod(self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
@@ -76,7 +78,7 @@ class ObjectRegistry(object):
         def createEndNode(self, x, y, case_batch, case_group):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
               sprite.scale = .5
-              self.general_registry.append(sprite)
+              self.EndNode = sprite
         def createNode(self, x, y, case_batch, case_group, ID):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
               sprite.scale = .5
@@ -88,16 +90,20 @@ class ObjectRegistry(object):
               self.logger.debug('node x: {} | node y: {}'.format(node.SPRITE.x, node.SPRITE.y))
               return node
       
-        def createDetectionField(node):
-              ## Set anchor to center top
-  
-              height = self.config.GENERAL_DETECTION_RADIUS
-              width = self.config.TRACK_WIDTH
-              x_pos = self.config.X_ZERO
-              y_pos = node.SPRITE.y
-  
+        def addDetectionFields(self):
+            ## Create for standard Nodes
+            for node in self.node_registry:
+                  self.createDetectionField(self.config.X_ZERO, node.SPRITE.y, self.config.CASE_1_BATCH, self.config.GROUP_B)
 
-              #self.general_registry.append()
+            ## Create for EndNode
+            self.createDetectionField(self.config.X_ZERO, self.EndNode.y, self.config.CASE_1_BATCH, self.config.GROUP_B)
+
+        def createDetectionField(self, x_pos, y_pos, case_batch, case_group):
+
+              sprite = pyglet.sprite.Sprite(self.config.DETECT_IMAGE, x_pos, y_pos, batch=case_batch, group=case_group)
+              sprite.visible=False
+              self.d_field_registry.append(sprite)
+
   
         def getNodeByID(self, ID):
               for node in self.node_registry:

@@ -10,6 +10,9 @@ import ObjectRegistry
 import logging
 import Config
 import subprocess
+import time
+from threading import Thread
+
 
 ## Subclass window
 class Interface(pyglet.window.Window):
@@ -68,6 +71,18 @@ class Interface(pyglet.window.Window):
 		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
 		pyglet.clock.schedule_interval(self.periodics.case_1_pod_position, 1/60.0)
 
+
+        def flashDetectors(self):
+                for d in self.ObjReg.d_field_registry:
+                    thread = Thread(target = self.startFlashThread, args = (d, ))
+                    thread.start()
+                   
+
+        def startFlashThread(self, d):
+                d.visible = True
+                time.sleep(.2)
+                d.visible=False
+
 	def on_activate(self):
 		logger.debug('----on_activate----')
 	def on_close(self):
@@ -84,6 +99,8 @@ class Interface(pyglet.window.Window):
 		self.clear()
 		self.general_batch.draw()
 		self.case1_batch.draw()
+
+
 
 
 ## Class containing periodic function for an Interface
@@ -139,6 +156,7 @@ class Periodic(object):
 	def case_1_master_clock_ticker(self, dt):
 		## Itereate through nodes and get pods within range		
 		self.interface.master_clock.startPulse()
+		self.interface.flashDetectors()
 	
 
 if __name__ == "__main__":

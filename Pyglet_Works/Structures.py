@@ -40,6 +40,13 @@ class Pod(object):
     ## 60 Hz
     def move(self, dt):
 
+
+        ## TODO: If too fast...do the inverse of catch-up...slow down to sync with pulse
+        ## Safeguard against extreme speed
+        self.logger.debug('POD {} | VEL {}'.format(self.ID, self.velocity))
+        if self.velocity >= self.config.MAX_POD_VEL:
+            self.velocity = self.config.POD_VEL
+
         #self.position_logger.info('{}'.format(self.SPRITE.y))
         self.SPRITE.y += self.velocity * dt
         #self.label.y  += self.velocity * dt
