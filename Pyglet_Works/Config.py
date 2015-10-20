@@ -49,8 +49,6 @@ class Config(object):
           self.CASE_1_NODE_START = 50
           self.CASE_1_numNodes = 3
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
-          self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 1
-          print 'GENERAL DETECTION RADIUS: {}'.format(self.GENERAL_DETECTION_RADIUS)
 
 
           ## Pod Attributes
@@ -92,6 +90,8 @@ class Config(object):
           self.DETECT_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/d_field.png')
           self.DETECT_IMAGE.anchor_x = self.DETECT_IMAGE.width / 2
           self.DETECT_IMAGE.anchor_y = self.DETECT_IMAGE.height
+          self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 1
+          print 'GENERAL DETECTION RADIUS: {}'.format(self.GENERAL_DETECTION_RADIUS)
   
           ## Interface Attributes
           self.X_ZERO = Interface.X_ZERO

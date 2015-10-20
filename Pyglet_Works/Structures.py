@@ -32,16 +32,18 @@ class Pod(object):
         ## AutoAdjust Variables
         self.buffer_time_START = 0
         self.buffer_time_END = 0
-        self.BUFFERING = False
 
         self.timer = 0
+
+
+        ## Pod States   
+        self.BUFFERING = False
+        self.POD_BUFFERING = False
 
 
     ## 60 Hz
     def move(self, dt):
 
-
-        ## TODO: If too fast...do the inverse of catch-up...slow down to sync with pulse
         ## Safeguard against extreme speed
         self.logger.debug('POD {} | VEL {}'.format(self.ID, self.velocity))
         if self.velocity >= self.config.MAX_POD_VEL:
@@ -62,10 +64,7 @@ class Pod(object):
             self.logger.debug('---- NODE {} BUFFER CONTACT POD {} ----'.format(node.ID, self.ID))
             self.buffer_time_END = time.time()
             total_buffer_time = self.buffer_time_END - self.buffer_time_START
-            self.logger.debug('buffer_time: {}'.format(total_buffer_time))    
-
-            if total_buffer_time > 1:
-                total_buffer_time = 0        
+            self.logger.debug('buffer_time: {}'.format(total_buffer_time))        
 
             ## Adjust vel
             self.adjustVelocity(total_buffer_time)
@@ -160,13 +159,12 @@ class Node(object):
 
 
             else:
-                ## Check if pod is in valid buffer zone
+                ## Check if pod is in valid node buffer zone
                 if (pod.SPRITE.y >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.y < self.UPPER_DETECTION_RADIUS):  
                     self.logger.debug('------- NODE {} BUFFERING POD {} --------'.format(self.ID, pod.ID))
                    # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
                     pod.START_buffer_time()
 
-        ## TODO: Add case for when there is no pod in near distance
 
     def isContact(self, pod):
         distance = abs(pod.SPRITE.y - self.SPRITE.y)

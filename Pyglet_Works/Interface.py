@@ -67,9 +67,10 @@ class Interface(pyglet.window.Window):
 		self.periodics = Periodic(self)
 		## Start Periodic Functions
 		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
-		pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
-		pyglet.clock.schedule_interval(self.periodics.case_1_pod_position, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.event_handler, 1/60.0)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
+		#pyglet.clock.schedule_interval(self.periodics.case_1_pod_position, 1/60.0)
 
 
         def flashDetectors(self):
@@ -114,15 +115,41 @@ class Periodic(object):
 		self.log_position_SET = False
 		self.timer = 0
 
-	def case_1_node_pod_link(self, dt):
-		logger.debug('----node pod link----')
-		for idx,pod in enumerate(self.interface.ObjReg.pod_registry):
-			pod.NODE_AHEAD = self.interface.ObjReg.node_registry[idx]
-			pod.NODE_AHEAD.registerNextPod(self)
 
-	def case_1_pod_motion(self, dt):
-		#logger.debug("periodic: dt: {}".format(dt))
+	def case_1_master_clock_ticker(self, dt):
+		## Itereate through nodes and get pods within range		
+		self.interface.master_clock.startPulse()
+		self.interface.flashDetectors()
 
+	def event_handler(self, dt):
+		self.movePods(dt)
+		self.checkNodePodContact()
+
+	def movePods(self, dt):
+		for pod in interface.ObjReg.pod_registry:
+			pod.move(dt)
+			#logger.debug('pod y: {}'.format(pod.SPRITE.y))
+
+			if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
+				pod.SPRITE.y = 0
+
+	def checkPodProximity(self, this_pod):
+		for pod in interface.ObjReg.pod_registry:
+
+			## If Within the buffer range 
+			buffer_range = abs(pod.SPRITE.y - this_pod.SPRITE.y)
+			if  buffer_range <= self.config.CASE_1_NODE_SPACING: 
+				pass
+
+	def checkNodePodContact(self):
+		for node in interface.ObjReg.node_registry:
+			for pod in interface.ObjReg.pod_registry:
+				if node.isContact(pod):
+					pod.hasContact(node)
+
+
+
+	def setPositionChecker(self):
 		## Start position checker after 1/2 seconds
 		if not self.log_position_SET:
 			self.timer += dt
@@ -130,20 +157,6 @@ class Periodic(object):
 				logger.debug('---- POSITION CHECKER ENABLED ----')
 				pyglet.clock.schedule_interval(self.case_1_position_checker, self.config.PULSE_WIDTH)
 				self.log_position_SET = True
-
-
-		for pod in interface.ObjReg.pod_registry:
-				pod.move(dt)
-				#logger.debug('pod y: {}'.format(pod.SPRITE.y))
-
-				if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
-					pod.SPRITE.y = 0
-
-	def case_1_check_pod_contact(self, dt):
-		for node in interface.ObjReg.node_registry:
-			for pod in interface.ObjReg.pod_registry:
-				if node.isContact(pod):
-					pod.hasContact(node)
 
 	## Get the position every 1/2 of a second.
 	def case_1_position_checker(self, dt):
@@ -154,11 +167,7 @@ class Periodic(object):
 	def case_1_pod_position(self, dt):
 		for pod in interface.ObjReg.pod_registry:
 			logger.debug('POD {} | POSITION {}'.format(pod.ID, pod.SPRITE.y))
-	def case_1_master_clock_ticker(self, dt):
-		## Itereate through nodes and get pods within range		
-		self.interface.master_clock.startPulse()
-		self.interface.flashDetectors()
-	
+
 
 if __name__ == "__main__":
 	## Establish Data Files
