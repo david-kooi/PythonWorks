@@ -183,7 +183,6 @@ class Periodic(object):
 						#pod.hasContact(node)
 
 
-
 	def setPositionChecker(self):
 		## Start position checker after 1/2 seconds
 		if not self.log_position_SET:

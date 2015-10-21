@@ -82,7 +82,6 @@ class Pod(object):
     
 
     def move(self, dt):
-
         ## Safeguard against extreme speed
         self.logger.debug('POD {} | VEL {}'.format(self.ID, self.velocity))
         if self.velocity >= self.config.MAX_POD_VEL:
@@ -103,7 +102,6 @@ class Pod(object):
         distance_between = pod.SPRITE.y - self.SPRITE.y
         if distance_between > 0:
             return True
-
     ## Starts when in range of node PULSE
     def START_node_buffer(self):
         self.buffer_time_START = time.time()
@@ -125,7 +123,6 @@ class Pod(object):
         if buffer_range >= self.config.POD_BUFFER_RANGE:
             return True
         return False
-
 
     def hasContact(self, node):
             self.logger.debug('---- NODE {} BUFFER CONTACT POD {} ----'.format(node.ID, self.ID))
