@@ -49,16 +49,18 @@ class Config(object):
           self.CASE_1_NODE_START = 50
           self.CASE_1_numNodes = 3
           self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
+          self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
+          self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width / 2
+          self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height / 2
 
 
           ## Pod Attributes
           self.pod_images = []
           self.POD_IMAGE_1 = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod_1.png')
           self.pod_images.append(self.POD_IMAGE_1)
-
           self.POD_IMAGE_2 = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/pod_2.png')
           self.pod_images.append(self.POD_IMAGE_2)
-
+          self.POD_BUFFER_RANGE = self.CASE_1_NODE_SPACING
           ## Configure Pod Images
           self.configurePodImages()
 
@@ -76,10 +78,6 @@ class Config(object):
           self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width / 2 ## Set anchor point to middle of image
           self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height / 2    
 
-          ## Node Attributes
-          self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
-          self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width / 2
-          self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height / 2
 
           ## Background
           self.BG_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/bg.png')

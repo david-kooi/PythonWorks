@@ -65,9 +65,10 @@ class Interface(pyglet.window.Window):
 
 		## Initalize Periodic functions
 		self.periodics = Periodic(self)
+
 		## Start Periodic Functions
-		pyglet.clock.schedule_interval(self.periodics.case_1_master_clock_ticker, self.configuration.PULSE_WIDTH)
-		pyglet.clock.schedule_interval(self.periodics.event_handler, 1/60.0)
+		pyglet.clock.schedule_interval(self.periodics.master_clock_ticker, self.configuration.PULSE_WIDTH)
+		pyglet.clock.schedule_interval(self.periodics.event_handler, 1/120.0)
 		#pyglet.clock.schedule_interval(self.periodics.case_1_pod_motion, 1/60.0)
 		#pyglet.clock.schedule_interval(self.periodics.case_1_check_pod_contact, 1/60.0)
 		#pyglet.clock.schedule_interval(self.periodics.case_1_pod_position, 1/60.0)
@@ -116,7 +117,7 @@ class Periodic(object):
 		self.timer = 0
 
 
-	def case_1_master_clock_ticker(self, dt):
+	def master_clock_ticker(self, dt):
 		## Itereate through nodes and get pods within range		
 		self.interface.master_clock.startPulse()
 		self.interface.flashDetectors()
@@ -124,6 +125,7 @@ class Periodic(object):
 	def event_handler(self, dt):
 		self.movePods(dt)
 		self.checkNodePodContact()
+		self.checkPodProximity()
 
 	def movePods(self, dt):
 		for pod in interface.ObjReg.pod_registry:
@@ -134,20 +136,51 @@ class Periodic(object):
 			if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
 				pod.SPRITE.y = 0
 
-	def checkPodProximity(self, this_pod):
-		for pod in interface.ObjReg.pod_registry:
+	## Handles pod - pod interaction. 
+	# Cases:
+	#  1. this_pod is buffering
+	#  		-> If this_pod has exited the buffer_range:
+	#			-> this_pod velocity set to default
+	#			-> remove this_pod's reference to bufferer_pod
+	#  2. this_pod has entered buffer_range of bufferer_pod
+	#		-> Set pod_buffer flag of this_pod
+	#		-> this_pod is given a reference to bufferer_pod
+	# 		-> this_pod velocity adjusted
+	def checkPodProximity(self):
+		for this_pod in interface.ObjReg.pod_registry:
 
-			## If Within the buffer range 
-			buffer_range = abs(pod.SPRITE.y - this_pod.SPRITE.y)
-			if  buffer_range <= self.config.CASE_1_NODE_SPACING: 
-				pass
+			## Check if this_pod is buffering
+			if this_pod.pod_buffering:
+				this_pod.event_handler(Pod.CHECK_POD_BUFFER)
+				# If this_pod is buffering there is no need to iterate through the other pods
+				continue
+			#
+
+			## If this_pod is not buffering scan through all other pods,
+			## and check if this_pod is too close to pod.
+			## If it is to close to another pod initiate pod buffer condition
+			for pod in interface.ObjReg.pod_registry:
+				## Skip itself
+				if this_pod.ID == pod.ID:
+					continue
+
+				## Only initiate buffer for pods ahead of this_pod
+				if this_pod.isBehind(pod):
+					## Check if within the buffer range
+					buffer_range = abs(pod.SPRITE.y - this_pod.SPRITE.y)
+					if  buffer_range <= self.config.POD_BUFFER_RANGE:
+						this_pod.event_handler(Pod.START_PB, pod)
+
+
 
 	def checkNodePodContact(self):
 		for node in interface.ObjReg.node_registry:
 			for pod in interface.ObjReg.pod_registry:
 				if node.isContact(pod):
-					pod.event_handler(command=Pod.HAS_CONTACT, node=node)
-					#pod.hasContact(node)
+					## Only trigger event if the pod if buffering
+					if pod.node_buffering:
+						pod.event_handler(command=Pod.HAS_CONTACT, node=node)
+						#pod.hasContact(node)
 
 
 

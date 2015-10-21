@@ -17,7 +17,9 @@ class Pod(object):
 
     MOVE = 'MOVE' 
     START_NB = 'START_NODE_BUFFER_TIME'
+    START_PB = 'START_POD_BUFFER'
     HAS_CONTACT = 'HAS_CONTACT'
+    CHECK_POD_BUFFER = 'CHECK_POD_BUFFER'
 
     def __init__(self, sprite, default_velocity, ID):
         self.logger = logging.getLogger('process_logger.POD')
@@ -39,29 +41,46 @@ class Pod(object):
 
         self.timer = 0
 
-
         ## Pod States   
-        self.NODE_BUFFERING = False
-        self.POD_BUFFERING = False
-        self.TARGET_POD = None
+        self.pod_buffering = False # 1st Priority
+        self.bufferer_pod = None 
+        self.node_buffering = False # 2nd Priority
 
     def event_handler(self, command, pod=None, node=None, dt=None):
+        ## Move happens unconditionally
         if command== Pod.MOVE:
             # TODO: Add code error protection
             #if dt is None:
             #    raise UsageException
 
             self.move(dt)
-        if command== Pod.START_NB:
-            self.START_buffer_time()
+
+
+        ## Pod Buffering takes priority over Node Buffering
+        if command == Pod.CHECK_POD_BUFFER:
+            self.logger.debug('---- CHECK_POD_BUFFER ----')
+            if self.exitedPodBufferRange():
+                self.STOP_pod_buffer()
+
+        if command == Pod.START_NB:
+            self.logger.debug('---- START NODE BUFFER ----')
+            self.START_node_buffer()
+
+        if command == Pod.START_PB:
+            #if pod is None:
+            #    raise UsageException
+
+            self.logger.debug('---- START POD BUFFER ----')
+            self.START_pod_buffer(pod)
+            self.adjustPodBufferVelocity(pod)
+
         if command == Pod.HAS_CONTACT:
+            self.logger.debug('---- HAS_CONTACT ----')
             #if node = None:
             # raise UsageException
             self.hasContact(node)
-        
+    
 
-
-    ## 60 Hz
     def move(self, dt):
 
         ## Safeguard against extreme speed
@@ -72,35 +91,62 @@ class Pod(object):
         #self.position_logger.info('{}'.format(self.SPRITE.y))
         self.SPRITE.y += self.velocity * dt
         #self.label.y  += self.velocity * dt
+    def adjustPodBufferVelocity(self, bufferer_pod):
+        pod_buffer = bufferer_pod.SPRITE.y - self.SPRITE.y
+        velocity_decrease = - ( (self.config.CASE_1_NODE_SPACING - pod_buffer) / self.config.NODE_TIME_DISTANCE )
+        self.velocity += velocity_decrease
+
+        self.logger.debug('Default Velocity: {}'.format(self.config.POD_VEL))
+        self.logger.debug('Velocity Decrease: {}'.format(velocity_decrease))
+
+    def isBehind(self, pod):
+        distance_between = pod.SPRITE.y - self.SPRITE.y
+        if distance_between > 0:
+            return True
 
     ## Starts when in range of node PULSE
-    def START_buffer_time(self):
+    def START_node_buffer(self):
         self.buffer_time_START = time.time()
-        self.BUFFERING = True
+        self.node_buffering = True
+
+    def START_pod_buffer(self, pod):
+        self.bufferer_pod = pod
+        self.pod_buffering = True
+
+    def STOP_pod_buffer(self):
+        self.velocity = self.config.POD_VEL
+        self.bufferer_pod = None
+        self.pod_buffering = False
+
+    def exitedPodBufferRange(self):
+        self.logger.debug('checking pod buffer range')
+        buffer_range = abs(self.bufferer_pod.SPRITE.y - self.SPRITE.y)
+        self.logger.debug('buffer_range: {}'.format(buffer_range))
+        if buffer_range >= self.config.POD_BUFFER_RANGE:
+            return True
+        return False
 
 
     def hasContact(self, node):
-        if self.NODE_BUFFERING:
             self.logger.debug('---- NODE {} BUFFER CONTACT POD {} ----'.format(node.ID, self.ID))
             self.buffer_time_END = time.time()
             total_buffer_time = self.buffer_time_END - self.buffer_time_START
             self.logger.debug('buffer_time: {}'.format(total_buffer_time))        
 
             ## Adjust vel
-            self.adjustVelocity(total_buffer_time)
+            self.adjustNodeContactVelocity(total_buffer_time)
 
             self.data_logger.info('V_{}'.format(self.velocity))
             self.data_logger.info('B_{}'.format(total_buffer_time))
 
-            self.BUFFERING = False
+            self.node_buffering = False
     
-    def adjustVelocity(self, buffer_time):
+    def adjustNodeContactVelocity(self, buffer_time):
         if self.config.AutoAdjust_ENABLED:
             self.logger.debug('Adjusting Velocity')
             spacing = self.config.CASE_1_NODE_SPACING
             time_distance = self.config.NODE_TIME_DISTANCE
             self.velocity =  spacing / (time_distance - buffer_time)
-
 
     def resetAutoAdjust(self):
         ## AutoAdjust Variables
