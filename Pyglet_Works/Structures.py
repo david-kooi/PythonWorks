@@ -15,6 +15,10 @@ class Clock(pyglet.event.EventDispatcher):
 
 class Pod(object):
 
+    MOVE = 'MOVE' 
+    START_NB = 'START_NODE_BUFFER_TIME'
+    HAS_CONTACT = 'HAS_CONTACT'
+
     def __init__(self, sprite, default_velocity, ID):
         self.logger = logging.getLogger('process_logger.POD')
         self.data_logger= logging.getLogger('data_logger')
@@ -37,8 +41,24 @@ class Pod(object):
 
 
         ## Pod States   
-        self.BUFFERING = False
+        self.NODE_BUFFERING = False
         self.POD_BUFFERING = False
+        self.TARGET_POD = None
+
+    def event_handler(self, command, pod=None, node=None, dt=None):
+        if command== Pod.MOVE:
+            # TODO: Add code error protection
+            #if dt is None:
+            #    raise UsageException
+
+            self.move(dt)
+        if command== Pod.START_NB:
+            self.START_buffer_time()
+        if command == Pod.HAS_CONTACT:
+            #if node = None:
+            # raise UsageException
+            self.hasContact(node)
+        
 
 
     ## 60 Hz
@@ -60,7 +80,7 @@ class Pod(object):
 
 
     def hasContact(self, node):
-        if self.BUFFERING:
+        if self.NODE_BUFFERING:
             self.logger.debug('---- NODE {} BUFFER CONTACT POD {} ----'.format(node.ID, self.ID))
             self.buffer_time_END = time.time()
             total_buffer_time = self.buffer_time_END - self.buffer_time_START
@@ -163,7 +183,8 @@ class Node(object):
                 if (pod.SPRITE.y >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.y < self.UPPER_DETECTION_RADIUS):  
                     self.logger.debug('------- NODE {} BUFFERING POD {} --------'.format(self.ID, pod.ID))
                    # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
-                    pod.START_buffer_time()
+                    pod.event_handler(Pod.START_NB) ## Start Node Buffer
+                    #pod.START_buffer_time()
 
 
     def isContact(self, pod):

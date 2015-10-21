@@ -127,7 +127,8 @@ class Periodic(object):
 
 	def movePods(self, dt):
 		for pod in interface.ObjReg.pod_registry:
-			pod.move(dt)
+			pod.event_handler(command=Pod.MOVE, dt=dt)
+			#pod.move(dt)
 			#logger.debug('pod y: {}'.format(pod.SPRITE.y))
 
 			if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
@@ -145,7 +146,8 @@ class Periodic(object):
 		for node in interface.ObjReg.node_registry:
 			for pod in interface.ObjReg.pod_registry:
 				if node.isContact(pod):
-					pod.hasContact(node)
+					pod.event_handler(command=Pod.HAS_CONTACT, node=node)
+					#pod.hasContact(node)
 
 
 
