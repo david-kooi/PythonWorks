@@ -87,11 +87,11 @@ class Pod(object):
         if self.velocity >= self.config.MAX_POD_VEL:
             self.velocity = self.config.POD_VEL
 
-        #self.position_logger.info('{}'.format(self.SPRITE.y))
-        self.SPRITE.y += self.velocity * dt
+        #self.position_logger.info('{}'.format(self.SPRITE.x))
+        self.SPRITE.x += self.velocity * dt
         #self.label.y  += self.velocity * dt
     def adjustPodBufferVelocity(self, bufferer_pod):
-        pod_buffer = bufferer_pod.SPRITE.y - self.SPRITE.y
+        pod_buffer = bufferer_pod.SPRITE.x - self.SPRITE.x
         velocity_decrease = - ( (self.config.CASE_1_NODE_SPACING - pod_buffer) / self.config.NODE_TIME_DISTANCE )
         self.velocity += velocity_decrease
 
@@ -99,7 +99,7 @@ class Pod(object):
         self.logger.debug('Velocity Decrease: {}'.format(velocity_decrease))
 
     def isBehind(self, pod):
-        distance_between = pod.SPRITE.y - self.SPRITE.y
+        distance_between = pod.SPRITE.x - self.SPRITE.x
         if distance_between > 0:
             return True
     ## Starts when in range of node PULSE
@@ -118,7 +118,7 @@ class Pod(object):
 
     def exitedPodBufferRange(self):
         self.logger.debug('checking pod buffer range')
-        buffer_range = abs(self.bufferer_pod.SPRITE.y - self.SPRITE.y)
+        buffer_range = abs(self.bufferer_pod.SPRITE.x - self.SPRITE.x)
         self.logger.debug('buffer_range: {}'.format(buffer_range))
         if buffer_range >= self.config.POD_BUFFER_RANGE:
             return True
@@ -183,16 +183,16 @@ class Node(object):
 
 
     def getDetectionRadius(self):
-        l = self.SPRITE.y - self.config.GENERAL_DETECTION_RADIUS
+        l = self.SPRITE.x - self.config.GENERAL_DETECTION_RADIUS
         ## Lower Detection radius of bottom node is translated to the top of the screen
         if l <= 0:
-            l = self.config.INTERFACE_HEIGHT - self.config.GENERAL_DETECTION_RADIUS
+            l = self.config.INTERFACE_WIDTH - self.config.GENERAL_DETECTION_RADIUS
         
-        u = self.SPRITE.y
+        u = self.SPRITE.x
 
         ## If lower radius is greater than upper limit then make upper limit top of screen
-        if l > u:
-            u = self.config.INTERFACE_HEIGHT
+        if l >= u:
+            u = self.config.INTERFACE_WIDTH
 
         ## Wrap return values
         d = dict()
@@ -223,15 +223,15 @@ class Node(object):
 
             else:
                 ## Check if pod is in valid node buffer zone
-                if (pod.SPRITE.y >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.y < self.UPPER_DETECTION_RADIUS):  
+                if (pod.SPRITE.x >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.x < self.UPPER_DETECTION_RADIUS):  
                     self.logger.debug('------- NODE {} BUFFERING POD {} --------'.format(self.ID, pod.ID))
-                   # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.y, self.ID, self.SPRITE.y))
+                   # self.logger.debug('| {}-POD_Y: {} | {}-NODE_Y: {} | '.format(pod.ID, pod.SPRITE.x, self.ID, self.SPRITE.x))
                     pod.event_handler(Pod.START_NB) ## Start Node Buffer
                     #pod.START_buffer_time()
 
 
     def isContact(self, pod):
-        distance = abs(pod.SPRITE.y - self.SPRITE.y)
+        distance = abs(pod.SPRITE.x - self.SPRITE.x)
         if distance < 5:
             return True
 

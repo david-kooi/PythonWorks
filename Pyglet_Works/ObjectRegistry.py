@@ -35,23 +35,20 @@ class ObjectRegistry(object):
             self.createBackground(self.config.GENERAL_BATCH, self.config.GROUP_A)
 
             ## Track
-            self.createTrack(self.config.X_ZERO, self.config.Y_ZERO, self.config.CASE_1_BATCH, self.config.GROUP_A)
+            self.createTrack(0, self.config.TRACK_HEIGHT, self.config.CASE_1_BATCH, self.config.GROUP_A)
 
             ## Nodes
             start_pos = self.config.CASE_1_NODE_SPACING #+ self.config.CASE_1_NODE_START
-            self.createNode(self.config.X_ZERO, 0 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=0)
-            self.createNode(self.config.X_ZERO, 1 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=1)
-            self.createNode(self.config.X_ZERO, 2 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B, ID=2)
-            self.createEndNode(self.config.X_ZERO, 3 * start_pos, self.config.CASE_1_BATCH, self.config.GROUP_B) ## 
+            self.createNode(x= (0 * start_pos), y= self.config.TRACK_HEIGHT, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_B, ID=0)
+            self.createEndNode(x = (1 * start_pos), y=self.config.TRACK_HEIGHT, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_B) ## 
 
             ## Node Detection Fields
             self.addDetectionFields()
 
             ## Pods
-            self.createPod(self.config.POD_IMAGE_1, self.config.X_ZERO, 0 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
-            self.createPod(self.config.POD_IMAGE_2, self.config.X_ZERO, 1 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
-            #self.createPod(self.config.X_ZERO, 2 * self.config.CASE_1_POD_SPACING, self.config.CASE_1_BATCH, self.config.GROUP_C)
-            #self.createPod(self.X_ZERO, 3 * self.config.CASE_1_POD_SPACING, Interface.CASE_1_BATCH, self.GROUP_C)
+            self.createPod(self.config.POD_IMAGE_1, x= (0 * self.config.CASE_1_POD_SPACING), y= self.config.TRACK_HEIGHT, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_C)
+           # self.createPod(self.config.POD_IMAGE_2, x= (1 * self.config.CASE_1_POD_SPACING), y= self.config.TRACK_HEIGHT, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_C)
+           
 
 
             ## Labels
@@ -77,11 +74,11 @@ class ObjectRegistry(object):
 
         def createEndNode(self, x, y, case_batch, case_group):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
-              sprite.scale = .5
+              #sprite.scale = .5
               self.EndNode = sprite
         def createNode(self, x, y, case_batch, case_group, ID):
               sprite = pyglet.sprite.Sprite(self.config.NODE_IMAGE, x, y, batch=case_batch, group=case_group)
-              sprite.scale = .5
+              #sprite.scale = .5
   
               node = Node(self.pod_registry, sprite, self.interface.master_clock, ID=ID)
               self.node_registry.append(node)
@@ -93,10 +90,10 @@ class ObjectRegistry(object):
         def addDetectionFields(self):
             ## Create for standard Nodes
             for node in self.node_registry:
-                  self.createDetectionField(self.config.X_ZERO, node.SPRITE.y, self.config.CASE_1_BATCH, self.config.GROUP_B)
+                  self.createDetectionField(x_pos=node.SPRITE.x, y_pos=node.SPRITE.y, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_B)
 
             ## Create for EndNode
-            self.createDetectionField(self.config.X_ZERO, self.EndNode.y, self.config.CASE_1_BATCH, self.config.GROUP_B)
+            self.createDetectionField(x_pos=self.EndNode.x, y_pos=self.EndNode.y, case_batch=self.config.CASE_1_BATCH, case_group=self.config.GROUP_B)
 
         def createDetectionField(self, x_pos, y_pos, case_batch, case_group):
 
@@ -113,7 +110,7 @@ class ObjectRegistry(object):
 	def createPod(self, pod_image, x, y, case_batch, case_group):
             ## Create Pod
             sprite = pyglet.sprite.Sprite(pod_image, x, y, batch=case_batch, group=case_group)
-            sprite.scale = .5
+            #sprite.scale = .5
 
             ## Attach to registry
             list_index = len(self.pod_registry)

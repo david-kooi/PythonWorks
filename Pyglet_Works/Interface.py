@@ -42,8 +42,8 @@ class Interface(pyglet.window.Window):
 		self.window_height = h
 		
 		## Set Coordinates
-		self.X_ZERO = w/2
-		self.Y_ZERO = h/2
+		self.X_ZERO = 0
+		self.Y_ZERO = 0
 
 		## Create Batches and Groups
 		self.group_a = pyglet.graphics.OrderedGroup(0)
@@ -95,7 +95,7 @@ class Interface(pyglet.window.Window):
 
 	def on_mouse_press(self, x, y, button, modifiers):
 		for pod in self.ObjReg.pod_registry:
-			pod.SPRITE.y = y
+			pod.SPRITE.x = x
 			break
 
 	def on_draw(self):
@@ -125,16 +125,16 @@ class Periodic(object):
 	def event_handler(self, dt):
 		self.movePods(dt)
 		self.checkNodePodContact()
-		self.checkPodProximity()
+		#self.checkPodProximity()
 
 	def movePods(self, dt):
 		for pod in interface.ObjReg.pod_registry:
 			pod.event_handler(command=Pod.MOVE, dt=dt)
 			#pod.move(dt)
-			#logger.debug('pod y: {}'.format(pod.SPRITE.y))
+			#logger.debug('pod y: {}'.format(pod.SPRITE.x))
 
-			if pod.SPRITE.y >= self.interface.window_height: #+ pod.SPRITE.height / 2:
-				pod.SPRITE.y = 0
+			if pod.SPRITE.x >= self.interface.window_width: #+ pod.SPRITE.height / 2:
+				pod.SPRITE.x = 0
 
 	## Handles pod - pod interaction. 
 	# Cases:
@@ -167,7 +167,7 @@ class Periodic(object):
 				## Only initiate buffer for pods ahead of this_pod
 				if this_pod.isBehind(pod):
 					## Check if within the buffer range
-					buffer_range = abs(pod.SPRITE.y - this_pod.SPRITE.y)
+					buffer_range = abs(pod.SPRITE.x - this_pod.SPRITE.x)
 					if  buffer_range <= self.config.POD_BUFFER_RANGE:
 						this_pod.event_handler(Pod.START_PB, pod)
 
@@ -195,12 +195,12 @@ class Periodic(object):
 	## Get the position every 1/2 of a second.
 	def case_1_position_checker(self, dt):
 		for pod in interface.ObjReg.pod_registry:
-			data_logger.info('P_{}'.format(pod.SPRITE.y))
+			data_logger.info('P_{}'.format(pod.SPRITE.x))
 
 
 	def case_1_pod_position(self, dt):
 		for pod in interface.ObjReg.pod_registry:
-			logger.debug('POD {} | POSITION {}'.format(pod.ID, pod.SPRITE.y))
+			logger.debug('POD {} | POSITION {}'.format(pod.ID, pod.SPRITE.x))
 
 
 if __name__ == "__main__":
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 	#data_logger.addHandler(console_handler)
 
 	## Create Window
-	interface = Interface(w=700, h=850, c="Interface")
+	interface = Interface(w=1200, h=480, c="Interface")
 
 	## Config
 	config = Config.Config(interface)

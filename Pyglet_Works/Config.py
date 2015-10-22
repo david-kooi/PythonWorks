@@ -10,7 +10,7 @@ class Config(object):
       def configurePodImages(self):
           for POD_IMAGE in self.pod_images:
               POD_IMAGE.anchor_x = POD_IMAGE.width / 2 ## Set anchor point to middle of image
-              POD_IMAGE.anchor_y = POD_IMAGE.height
+              POD_IMAGE.anchor_y = POD_IMAGE.height / 2
       def __init__(self, Interface=None):
           self.logger = logging.getLogger('Config')
 
@@ -37,18 +37,18 @@ class Config(object):
           self.BLUE = (64, 97, 228, 255)
           self.BLACK = (0,0,0,0)
 
-          ## Case1 Attributes
-          self.CASE_1_numPods = 2
-          self.CASE_1_POD_SPACING = Interface.window_height/self.CASE_1_numPods
+          ## General Attributes
+          self.CASE_1_numPods = 1
+          self.CASE_1_POD_SPACING = Interface.window_width/self.CASE_1_numPods
           self.PULSE_WIDTH = 1
           self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 1 # Distance in time
+          self.TRACK_HEIGHT = Interface.window_height / 2
 
           ## Node Attributes
+          self.CASE_1_numNodes = 1
           self.NODE_RADIUS = 15
-          self.NODE_COLOR = (203, 26, 10, 255)
-          self.CASE_1_NODE_START = 50
-          self.CASE_1_numNodes = 3
-          self.CASE_1_NODE_SPACING = Interface.window_height/self.CASE_1_numNodes
+          self.CASE_1_NODE_SPACING = Interface.window_width/self.CASE_1_numNodes
+          self.logger.debug('NodeSpacing: {}'.format(self.CASE_1_NODE_SPACING))
           self.NODE_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/node.png')   
           self.NODE_IMAGE.anchor_x = self.NODE_IMAGE.width / 2
           self.NODE_IMAGE.anchor_y = self.NODE_IMAGE.height / 2
@@ -65,7 +65,6 @@ class Config(object):
           self.configurePodImages()
 
           self.POD_RADIUS = 30
-          self.POD_COLOR = (255, 255, 255, 255)
           self.POD_VEL = self.CASE_1_NODE_SPACING/(self.NODE_TIME_DISTANCE) # r = d/t where t = 1s
           self.MAX_POD_VEL = self.POD_VEL + 1000
 
@@ -75,7 +74,7 @@ class Config(object):
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
-          self.TRACK_IMAGE.anchor_x = self.TRACK_IMAGE.width / 2 ## Set anchor point to middle of image
+          self.TRACK_IMAGE.anchor_x = 0 ## Set anchor point to middle of image
           self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height / 2    
 
 
@@ -86,21 +85,15 @@ class Config(object):
 
           ## Detector Field
           self.DETECT_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/d_field.png')
-          self.DETECT_IMAGE.anchor_x = self.DETECT_IMAGE.width / 2
-          self.DETECT_IMAGE.anchor_y = self.DETECT_IMAGE.height
+          self.DETECT_IMAGE.anchor_x = self.DETECT_IMAGE.width
+          self.DETECT_IMAGE.anchor_y = self.DETECT_IMAGE.height / 2
           self.GENERAL_DETECTION_RADIUS = self.CASE_1_NODE_SPACING / 1
           print 'GENERAL DETECTION RADIUS: {}'.format(self.GENERAL_DETECTION_RADIUS)
   
           ## Interface Attributes
-          self.X_ZERO = Interface.X_ZERO
+          self.X_ZERO = 0
           self.Y_ZERO = Interface.Y_ZERO
   
-          ## Track Attributes
-          self.TRACK_X = self.X_ZERO-self.POD_RADIUS
-          self.TRACK_Y = self.Y_ZERO/2
-  
-          self.TRACK_WIDTH = self.POD_RADIUS*2
-          self.TRACK_LENGTH = Interface.Y_ZERO * 2 # Track length is height of the screen
   
           self.BUTTON_HEIGHT = Interface.window_height/15
           self.BUTTON_WIDTH = Interface.window_width/5
