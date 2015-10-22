@@ -192,11 +192,6 @@ class Periodic(object):
 				pyglet.clock.schedule_interval(self.case_1_position_checker, self.config.PULSE_WIDTH)
 				self.log_position_SET = True
 
-	## Get the position every 1/2 of a second.
-	def case_1_position_checker(self, dt):
-		for pod in interface.ObjReg.pod_registry:
-			data_logger.info('P_{}'.format(pod.SPRITE.x))
-
 
 	def case_1_pod_position(self, dt):
 		for pod in interface.ObjReg.pod_registry:

@@ -216,11 +216,7 @@ class Node(object):
                 self.logger.debug('---- NODE {} PULSE CONTACT POD {} ----'.format(self.ID, pod.ID))
                 pod.velocity = self.config.POD_VEL
                 self.POD_IN_CONTACT = pod
-
-                self.data_logger.info('V_{}'.format(pod.velocity))
-                self.data_logger.info('B_0')
-
-
+                
             else:
                 ## Check if pod is in valid node buffer zone
                 if (pod.SPRITE.x >= self.LOWER_DETECTION_RADIUS) and (pod.SPRITE.x < self.UPPER_DETECTION_RADIUS):  
