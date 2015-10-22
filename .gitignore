@@ -1,6 +1,5 @@
 *.pyc
 *.txt
 *.log
-*.png
 *.svg
-PygletWorks/res/*
+PygletWorks/res/OLD/
