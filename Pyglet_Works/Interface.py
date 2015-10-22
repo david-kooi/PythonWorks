@@ -228,7 +228,7 @@ if __name__ == "__main__":
 	data_handler = logging.FileHandler(data_FILE)
 	data_handler.setLevel(logging.INFO)
 	data_logger.addHandler(data_handler)
-	data_logger.addHandler(console_handler)
+	#data_logger.addHandler(console_handler)
 
 	## Create Window
 	interface = Interface(w=700, h=850, c="Interface")
