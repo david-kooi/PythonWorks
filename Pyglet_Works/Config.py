@@ -40,7 +40,7 @@ class Config(object):
           ## General Attributes
           self.CASE_1_numPods = 1
           self.CASE_1_POD_SPACING = Interface.window_width/self.CASE_1_numPods
-          self.PULSE_WIDTH = 1
+          self.PULSE_WIDTH = 2
           self.NODE_TIME_DISTANCE = self.PULSE_WIDTH * 1 # Distance in time
           self.TRACK_HEIGHT = Interface.window_height / 2
 
@@ -74,7 +74,7 @@ class Config(object):
 
           ## Track Attributes
           self.TRACK_IMAGE = pyglet.image.load('/Users/TheTraveler/Workspace/PythonWorks/Pyglet_Works/res/track.png')
-          self.TRACK_IMAGE.anchor_x = 0 ## Set anchor point to middle of image
+          self.TRACK_IMAGE.anchor_x = 0
           self.TRACK_IMAGE.anchor_y = self.TRACK_IMAGE.height / 2    
 
 
